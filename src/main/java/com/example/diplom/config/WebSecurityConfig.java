@@ -28,6 +28,7 @@ public class WebSecurityConfig extends VaadinWebSecurity {
         super.configure(http);
         setLoginView(http, loginPage.class);
 
+
     }
 
 
