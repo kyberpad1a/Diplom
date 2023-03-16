@@ -3,6 +3,7 @@ package com.example.diplom.view.auth;
 import com.example.diplom.view.user.user;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.notification.Notification;
@@ -11,6 +12,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,16 +22,18 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.io.InputStream;
+
 @Route("login")
 //@CssImport(value = "./login-rich-content.css")
-@Theme(variant = Lumo.DARK)
+//@Theme(variant = Lumo.DARK)
 public class loginPage extends VerticalLayout {
     private final AuthenticationManager authenticationManager;
 //    @Autowired
 //    private PasswordEncoder passwordEncoder;
     public loginPage(AuthenticationManager authenticationManager){
         this.authenticationManager = authenticationManager;
-       // addClassName("login-rich-content");
+       addClassName("login-rich-content");
         //loginForm.getElement().getThemeList().add("dark");
         TextField usernameField = new TextField("Логин");
         PasswordField passwordField = new PasswordField("Пароль");
@@ -39,7 +43,6 @@ public class loginPage extends VerticalLayout {
 
                         String username = usernameField.getValue();
             String password = passwordField.getValue();
-//            Notification.show(passwordEncoder.encode(password));
             final Authentication authentication = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(username, password));
                 if(authentication != null ) {
@@ -55,38 +58,20 @@ public class loginPage extends VerticalLayout {
                     }
                 }}
             catch (AuthenticationException ex) { //
-                // show default error message
-                // Note: You should not expose any detailed information here like "username is known but password is wrong"
-                // as it weakens security.
                 Notification.show("Неверное имя пользователя или пароль");
             }
 
 
         });
-//        Button loginButton = new Button("Login", buttonClickEvent -> {
-//            String username = usernameField.getValue();
-//            String password = passwordField.getValue();
-//
-//
-//            Authentication authentication = new UsernamePasswordAuthenticationToken(username, password);
-//
-//            try {
-//
-//                Authentication authenticated = authenticationManager.authenticate(authentication);
-//
-//
-//                SecurityContextHolder.getContext().setAuthentication(authenticated);
-//
-//
-//                Notification.show("aboba");
-//            } catch (AuthenticationException ex) {
-//                Notification.show(ex.toString(), 3000, Notification.Position.BOTTOM_CENTER);
-//            }
-//        });
-        Button registerButton = new Button("registration");
-        Label label = new Label("Авторизация");
+
+        Button registerButton = new Button("Регистрация");
+        registerButton.addClickListener(buttonClickEvent -> {
+            UI.getCurrent().navigate(registrationPage.class);
+        });
+        H1 label = new H1("Авторизация");
+        RouterLink forgotPwd = new RouterLink("Забыли пароль?", restorePage.class);
         HorizontalLayout btns = new HorizontalLayout(loginButton, registerButton);
-        VerticalLayout loginFormLayout = new VerticalLayout(label, usernameField, passwordField, btns
+        VerticalLayout loginFormLayout = new VerticalLayout(label, usernameField, passwordField, btns, forgotPwd
         );
         loginFormLayout.setHeightFull();
         loginFormLayout.setMargin(true);
@@ -96,13 +81,10 @@ public class loginPage extends VerticalLayout {
                 loginFormLayout
         );
         loginPageLayout.setSizeFull();
-        //loginPageLayout.setHeight("500px");
-        //loginPageLayout.setWidth("200px");
-        //loginPageLayout.setAlignItems(Alignment.START);
         add(loginPageLayout);
-        Image backgroundImage = new Image("./images/dungeon.jpg", "Login Background");
+        Image backgroundImage = new Image("./images/Screenshot_2.png", "Login Background");
         backgroundImage.setWidth("100%");
-        backgroundImage.setHeight("500px");
+        backgroundImage.setHeight("700px");
 
 
 

@@ -4,6 +4,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -14,7 +16,11 @@ public class modelUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long ID_User;
     @Column(unique = true)
+    @NotEmpty
+    @NotNull
     private String username;
+    @NotEmpty
+    @NotNull
     private String password;
     private boolean active;
 
@@ -22,6 +28,8 @@ public class modelUser {
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     private Set<roleEnum> roles;
+
+    public modelUser(){}
 
     public Long getID_User() {
         return ID_User;
