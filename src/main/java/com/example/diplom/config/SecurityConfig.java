@@ -38,17 +38,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable()
                 .authorizeRequests()
 
+
                 .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
 
                 // Allow all requests by logged-in users.
                 .anyRequest().authenticated()
 
                 // Configure the login page.
-                .and().formLogin()
-                .loginPage(LOGIN_URL).permitAll()
-
+                .and().formLogin().loginPage(LOGIN_URL).permitAll()
+                .and().anonymous().key("myAnonymousKey")
                 // Configure logout
-                .and().logout().logoutSuccessUrl(LOGOUT_SUCCESS_URL).and();
+                .and().logout().logoutSuccessUrl(LOGOUT_SUCCESS_URL)
+                ;
     }
 
     @Bean

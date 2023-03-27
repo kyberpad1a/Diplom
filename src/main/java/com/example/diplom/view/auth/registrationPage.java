@@ -13,6 +13,7 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -47,8 +48,8 @@ public class registrationPage extends VerticalLayout {
         // Set the size of the images
         leftImage.setWidth("50%");
         rightImage.setWidth("50%");
-        leftImage.setHeight("700px");
-        rightImage.setHeight("700px");
+        leftImage.setHeight("715px");
+        rightImage.setHeight("715px");
 
 
         TextField nameField = new TextField("Имя");
@@ -75,6 +76,9 @@ public class registrationPage extends VerticalLayout {
         password.setPlaceholder("Введите пароль");
         password.addClassName("bordered");
         password.setWidth("100%");
+       // password.setTooltipText("пароль должен быть такой-то");
+        Tooltip tooltip = password.getTooltip().withManual(true);
+        password.setHelperText("yhhyhu");
 
         PasswordField confirmPasswordField = new PasswordField("Подтвердите пароль");
         confirmPasswordField.setPlaceholder("Подтвердите пароль");
@@ -111,6 +115,7 @@ public class registrationPage extends VerticalLayout {
         btns.setWidthFull();
         btns.setSizeFull();
         btns.setFlexGrow(1, btns);
+        btns.setAlignItems(Alignment.CENTER);
 
 //        VerticalLayout fieldLayout = new VerticalLayout(surnameField, nameField, patronymicField, loginField, passwordField, confirmPasswordField, btns);
         VerticalLayout fieldLayout = new VerticalLayout(heading, username, password, confirmPasswordField, btns);

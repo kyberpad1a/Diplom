@@ -3,6 +3,8 @@ package com.example.diplom.view.auth;
 import com.example.diplom.view.user.user;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Label;
@@ -24,9 +26,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.InputStream;
 
-@Route("login")
-//@CssImport(value = "./login-rich-content.css")
-//@Theme(variant = Lumo.DARK)
+@Route("/login")
+//@CssImport(value = "")
+//@Theme("login-rich-content.css")
 public class loginPage extends VerticalLayout {
     private final AuthenticationManager authenticationManager;
 //    @Autowired
@@ -40,8 +42,7 @@ public class loginPage extends VerticalLayout {
         Button loginButton = new Button("Войти");
         loginButton.addClickListener(buttonClickEvent->{
             try{
-
-                        String username = usernameField.getValue();
+            String username = usernameField.getValue();
             String password = passwordField.getValue();
             final Authentication authentication = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(username, password));
@@ -65,6 +66,7 @@ public class loginPage extends VerticalLayout {
         });
 
         Button registerButton = new Button("Регистрация");
+        //registerButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         registerButton.addClickListener(buttonClickEvent -> {
             UI.getCurrent().navigate(registrationPage.class);
         });
