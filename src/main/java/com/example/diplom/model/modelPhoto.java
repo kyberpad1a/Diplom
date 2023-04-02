@@ -10,10 +10,11 @@ public class modelPhoto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long ID_Photo;
-    @NotNull
-    @NotBlank
-    private String Photo_Path;
-    @ManyToOne(optional = true, cascade = CascadeType.ALL)
+
+    @Lob
+
+    private byte[] Photo_Path;
+    @ManyToOne(optional = true, cascade = CascadeType.MERGE)
     private modelGood good;
 
     public Long getID_Photo() {
@@ -24,11 +25,11 @@ public class modelPhoto {
         this.ID_Photo = ID_Photo;
     }
 
-    public String getPhoto_Path() {
+    public byte[] getPhoto_Path() {
         return Photo_Path;
     }
 
-    public void setPhoto_Path(String photo_Path) {
+    public void setPhoto_Path(byte[] photo_Path) {
         Photo_Path = photo_Path;
     }
 
@@ -40,7 +41,7 @@ public class modelPhoto {
         this.good = good;
     }
 
-    public modelPhoto(Long ID_Photo, String photo_Path, modelGood good) {
+    public modelPhoto(Long ID_Photo, @NotNull @NotBlank byte[] photo_Path, modelGood good) {
         this.ID_Photo = ID_Photo;
         Photo_Path = photo_Path;
         this.good = good;

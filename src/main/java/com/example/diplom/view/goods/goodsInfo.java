@@ -6,7 +6,7 @@ import com.example.diplom.model.modelGood;
 import com.example.diplom.repo.CategoryRepository;
 import com.example.diplom.repo.FranchiseRepository;
 import com.example.diplom.repo.GoodRepository;
-import com.example.diplom.service.franchiseService;
+import com.example.diplom.repo.PhotoRepository;
 import com.example.diplom.service.goodService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -16,7 +16,6 @@ import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -27,18 +26,26 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.FileData;
+import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.component.upload.receivers.MultiFileBuffer;
+import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.StreamResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.config.web.server.ServerHttpSecurity;
 
-import java.util.Locale;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 import java.util.stream.Stream;
 
 @PageTitle("Информация о товарах")
@@ -47,13 +54,16 @@ public class goodsInfo extends VerticalLayout {
     private transient goodService service;
     private String absolutePath;
     private int charLimit = 1000;
+    private Long photoID;
     Long id;
     private Binder<modelGood> binder = new BeanValidationBinder<>(modelGood.class);
-
+    private List<byte[]> bytes;
     Grid<modelGood> grid = new Grid<>(modelGood.class, false);
 
-    private void submitRequest() {
-        service.addGood(binder.getBean());
+
+
+    private void submitRequest(List<byte[]> bytes) {
+        service.addGood(binder.getBean(), bytes);
     }
     private boolean pressFlag;
 
@@ -65,24 +75,40 @@ public class goodsInfo extends VerticalLayout {
         binder.setBean(new modelGood());
     }
     @Autowired
-    public goodsInfo(GoodRepository repository, goodService service, @Autowired FranchiseRepository franchiseRepository, @Autowired CategoryRepository categoryRepository){
+    public goodsInfo(GoodRepository repository, goodService service, @Autowired FranchiseRepository franchiseRepository, @Autowired CategoryRepository categoryRepository, PhotoRepository photoRepository, List<byte[]> bytes){
         this.service = service;
+        this.bytes=bytes;
 
-        MultiFileBuffer multiFileBuffer = new MultiFileBuffer();
+        MultiFileMemoryBuffer multiFileBuffer = new MultiFileMemoryBuffer();
+        //MemoryBuffer memoryBuffer = new MemoryBuffer();
+
+
+
         Upload multiFileUpload = new Upload(multiFileBuffer);
+        multiFileUpload.setAcceptedFileTypes("image/jpeg","image/jpg", "image/png", "image/gif");
+
         multiFileUpload.addSucceededListener(event -> {
-            // Determine which file was uploaded successfully
-            String uploadFileName = event.getFileName();
-            // Get information for that specific file
-            FileData savedFileData = multiFileBuffer
-                    .getFileData(uploadFileName);
-            absolutePath = savedFileData.getFile().getAbsolutePath();
+            String attachmentName = event.getFileName();
+            try {
+                // The image can be jpg png or gif, but we store it always as png file in this example
+                BufferedImage inputImage = ImageIO.read(multiFileBuffer.getInputStream(attachmentName));
+                ByteArrayOutputStream pngContent = new ByteArrayOutputStream();
+                ImageIO.write(inputImage, "png", pngContent);
+                bytes.add(pngContent.toByteArray());
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+
 
 
         });
-        multiFileUpload.setMaxFileSize(200);
+        //multiFileUpload.setMaxFileSize(200);
         multiFileUpload.setSizeFull();
-        multiFileUpload.setAcceptedFileTypes(".jpeg", ".png");
+       // multiFileUpload.setAcceptedFileTypes(".jpeg", ".png");
 
         Dialog addPopup = new Dialog();
         Dialog updPopup = new Dialog();
@@ -106,6 +132,7 @@ public class goodsInfo extends VerticalLayout {
         Div prefix = new Div();
         prefix.setText("₽");
         addPrice.setPrefixComponent(prefix);
+
         addPrice.setPattern("\\d\\d\\d\\d\\d.\\d\\d");
         ComboBox<modelCategory> cbCategory = new ComboBox("Категория");
         cbCategory.setItems(categoryRepository.findAll());
@@ -132,6 +159,7 @@ public class goodsInfo extends VerticalLayout {
                 // Use two columns, if layout's width exceeds 500px
                 new FormLayout.ResponsiveStep("500px", 2));
         addPopupLayout.setColspan(addDescription, 2);
+        addPopupLayout.setColspan(multiFileUpload, 2);
         addPopupLayout.setColspan(btnAddGood, 2);
         addPopupLayout.setColspan(header, 2);
         addPopupLayout.setColspan(label, 2);
@@ -145,9 +173,11 @@ public class goodsInfo extends VerticalLayout {
         Button btnAdd = new Button("Добавить");
 
         //grid.setSizeFull();
-        grid.addColumn(modelGood::getGood_Name).setHeader("Название товара");
+        grid.addColumn(modelGood::getGood_Name).setHeader("Название товара").setWidth("74%");
         //grid.addColumn(modelGood::getFranchise).setHeader("Франшиза");
-        grid.addColumn(modelGood::getCategory).setHeader("Категория");
+
+        //modelCategory categoryRow = categoryRepository.findAllByAffectedGoods(repository.findAll());
+        grid.addColumn(item -> item.getCategory().getCategory_Name()).setHeader("Категория");
         grid.setItemDetailsRenderer(createGoodDetailsRenderer());
         grid.addComponentColumn(item -> {
             Button btnEdit = new Button(new Icon(VaadinIcon.EDIT));
@@ -192,10 +222,17 @@ public class goodsInfo extends VerticalLayout {
        binder.forField(addPrice).asRequired("Заполните поле 'Цена'").withValidator(price -> price> 0.0 && price<=99999.99, "Неверный формат цены").bind(modelGood::getGood_Price, modelGood::setGood_Price);
        binder.forField(cbFranchise).asRequired("Выберите франшизу").bind(modelGood::getFranchise, modelGood::setFranchise);
        binder.forField(cbCategory).asRequired("Выберите категорию").bind(modelGood::getCategory, modelGood::setCategory);
+
        binder.addStatusChangeListener(e -> btnAddGood.setEnabled(binder.isValid()));
         btnAddGood.addClickListener(buttonClickEvent -> {
             try {
-                submitRequest();
+//                modelPhoto modelPhoto = new modelPhoto();
+//                modelPhoto.setPhoto_Path(absolutePath);
+                //photoRepository.save(modelPhoto);
+                //photoID=modelPhoto.getID_Photo();
+                submitRequest(bytes);
+                bytes.clear();
+
                 init();
                 grid.setItems(repository.findAll());
                 Notification.show("Успешно добавлено", 3000, Notification.Position.BOTTOM_CENTER);
@@ -237,6 +274,8 @@ public class goodsInfo extends VerticalLayout {
         TextField cbFranchise = new TextField("Франшиза");
         TextField cbCategory = new TextField("Категория");
         TextArea addDescription = new TextArea("Описание");
+
+
         Div prefix = new Div();
 
 
@@ -246,6 +285,7 @@ public class goodsInfo extends VerticalLayout {
             Stream.of(addGoodName, addMaterial, addPrice, cbCategory, cbFranchise, addDescription).forEach(field -> {
                 field.setReadOnly(true);
                 add(field);
+
             });
 
         }
@@ -255,9 +295,10 @@ public class goodsInfo extends VerticalLayout {
             addDescription.setValue(good.getGood_Description());
             addMaterial.setValue(good.getGood_Material());
             addPrice.setValue(String.valueOf(good.getGood_Price()));
-            cbCategory.setValue(String.valueOf(good.getCategory()));
+            cbCategory.setValue(String.valueOf(good.getCategory().getCategory_Name()));
            // cbCategory.setItemLabelGenerator(modelCategory::getCategory_Name);
-            cbFranchise.setValue(String.valueOf(good.getFranchise()));
+            cbFranchise.setValue(String.valueOf(good.getFranchise().getFranchise_Name()));
+            //path.setValue(modelPhoto.getPhoto_Path());
            // cbFranchise.setItemLabelGenerator(modelFranchise::getFranchise_Name);
         }
 }}
