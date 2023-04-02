@@ -7,7 +7,9 @@ import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -22,6 +24,7 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import java.util.Optional;
 @Route(value = "/goods")
+@AnonymousAllowed
 @RouteAlias(value = "/")
 public class goodsPage extends AppLayout {
     private final Tabs menu;
@@ -73,12 +76,12 @@ public class goodsPage extends AppLayout {
         // Have a drawer header with an application logo
         HorizontalLayout logoLayout = new HorizontalLayout();
         logoLayout.setId("logo");
-        Image IMG = new Image("images/logo3.svg", "My Project logo");
+        Image IMG = new Image("images/logo4.png", "My Project logo");
         IMG.setHeight("103px");
         IMG.setWidth("103px");
         logoLayout.setAlignItems(FlexComponent.Alignment.CENTER);
         logoLayout.add(IMG);
-        logoLayout.add(new H1("Merch Shop"));
+        logoLayout.add(new H2("Логово лича"));
 
         // Display the logo and the menu in the drawer
         layout.add(logoLayout, menu);

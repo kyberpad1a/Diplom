@@ -21,7 +21,7 @@ public class modelCategory {
 
     public modelCategory(Long ID_Category, String category_Name, Collection<modelGood> affectedGoods) {
         this.ID_Category = ID_Category;
-        this.Category_Name = category_Name;
+        Category_Name = category_Name;
         this.affectedGoods = affectedGoods;
     }
 

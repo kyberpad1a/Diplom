@@ -4,6 +4,7 @@ import com.example.diplom.model.modelCategory;
 import com.example.diplom.model.modelUser;
 import com.example.diplom.repo.CategoryRepository;
 import com.example.diplom.service.categoryService;
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
@@ -33,7 +34,7 @@ public class categoryInfo extends VerticalLayout {
     private transient categoryService service;
     Long id;
     private Binder<modelCategory> binder = new BeanValidationBinder<>(modelCategory.class);
-
+ private boolean pressFlag;
     Grid<modelCategory> grid = new Grid<>(modelCategory.class, false);
 
     private void submitRequest() {
@@ -52,17 +53,17 @@ public class categoryInfo extends VerticalLayout {
         this.service = service;
         Dialog addPopup = new Dialog();
         Dialog updPopup = new Dialog();
-        Label header1 = new Label("Изменение данных");
+       // Label header1 = new Label("Изменение данных");
         Label header = new Label("Добавление данных");
         TextField addCategory = new TextField("Наименование категории");
-        TextField updCategory = new TextField("Наименование категории");
+        //TextField updCategory = new TextField("Наименование категории");
         addCategory.setSizeFull();
         Button btnAddCategory = new Button("Добавить");
         Button btnUpdCategory = new Button("Изменить");
         btnAddCategory.setSizeFull();
         VerticalLayout addPopupLayout = new VerticalLayout();
         VerticalLayout updPopupLayout = new VerticalLayout();
-        updPopupLayout.add(header1, updCategory, btnUpdCategory);
+      //  updPopupLayout.add(header1, updCategory, btnUpdCategory);
         addPopupLayout.add(header, addCategory, btnAddCategory);
         addPopup.add(addPopupLayout);
         updPopup.add(updPopupLayout);
@@ -82,9 +83,17 @@ public class categoryInfo extends VerticalLayout {
                 repository.delete(item);
                 grid.setItems(repository.findAll());
             });
+
             btnEdit.addClickListener(buttonClickEvent -> {
                 id=item.getID_Category();
-                updPopup.open();
+                header.setText("Изменение данных");
+                //addPopupLayout.add(header1);
+                addPopupLayout.add(btnUpdCategory);
+                addPopupLayout.remove(btnAddCategory);
+                //addPopupLayout.remove(header1);
+
+                pressFlag = true;
+                addPopup.open();
 
             });
             HorizontalLayout layout1 = new HorizontalLayout();
@@ -92,12 +101,25 @@ public class categoryInfo extends VerticalLayout {
             return layout1;
         }).setTextAlign(ColumnTextAlign.END).setFrozenToEnd(true).setHeader(btnAdd);
         btnAdd.addClickListener(buttonClickEvent -> {
+            if (pressFlag==true){
+                //addPopupLayout.add(header);
+                header.setText("Добавление данных");
+                addPopupLayout.add(btnAddCategory);
+                 addPopupLayout.remove(btnUpdCategory);
+                 //addPopupLayout.remove(header1);
+
+            }
+            pressFlag = false;
+
+
             addPopup.open();
         });
         binder.forField(addCategory).asRequired("Заполните поле 'Наименование категории'").bind(modelCategory::getCategory_Name, modelCategory::setCategory_Name);
-        binder.forField(updCategory).asRequired("Заполните поле 'Наименование категории'").bind(modelCategory::getCategory_Name, modelCategory::setCategory_Name);
+        //binder.forField(updCategory).asRequired("Заполните поле 'Наименование категории'").bind(modelCategory::getCategory_Name, modelCategory::setCategory_Name);
         binder.addStatusChangeListener(e -> btnAddCategory.setEnabled(binder.isValid()));
-        //binder.addStatusChangeListener(e -> btnUpdCategory.setEnabled(binder.isValid()));
+        binder.addStatusChangeListener(e -> btnUpdCategory.setEnabled(binder.isValid()));
+        //addCategory.addValidationStatusChangeListener(e -> btnAddCategory.setEnabled(binder.isValid()));
+        btnAddCategory.addClickShortcut(Key.ENTER);
         btnAddCategory.addClickListener(buttonClickEvent -> {
             try {
                 submitRequest();
@@ -111,13 +133,14 @@ public class categoryInfo extends VerticalLayout {
                 Notification.show("Категория с текущим наименованием уже существует", 3000, Notification.Position.BOTTOM_CENTER);
             }
         });
+        btnUpdCategory.addClickShortcut(Key.ENTER);
         btnUpdCategory.addClickListener(buttonClickEvent -> {
             try{
             updateRequest();
             init();
             grid.setItems(repository.findAll());
             Notification.show("Успешно изменено", 3000, Notification.Position.BOTTOM_CENTER);
-            updPopup.close();}
+            addPopup.close();}
             catch (DataIntegrityViolationException ex){
                 Notification.show("Категория с текущим наименованием уже существует", 3000, Notification.Position.BOTTOM_CENTER);
             }

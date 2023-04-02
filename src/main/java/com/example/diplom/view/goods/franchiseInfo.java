@@ -36,6 +36,7 @@ public class franchiseInfo extends VerticalLayout {
     private void submitRequest() {
         service.addFranchise(binder.getBean());
     }
+    private boolean pressFlag;
 
     private void updateRequest(){
         service.updateFranchise(binder.getBean(), id);
@@ -52,14 +53,14 @@ public class franchiseInfo extends VerticalLayout {
         Label header1 = new Label("Изменение данных");
         Label header = new Label("Добавление данных");
         TextField addFranchise = new TextField("Наименование франшизы");
-        TextField updFranchise = new TextField("Наименование франшизы");
+       // TextField updFranchise = new TextField("Наименование франшизы");
         addFranchise.setSizeFull();
         Button btnAddFranchise = new Button("Добавить");
         Button btnUpdFranchise = new Button("Изменить");
         btnAddFranchise.setSizeFull();
         VerticalLayout addPopupLayout = new VerticalLayout();
         VerticalLayout updPopupLayout = new VerticalLayout();
-        updPopupLayout.add(header1, updFranchise, btnUpdFranchise);
+        //updPopupLayout.add(header1, updFranchise, btnUpdFranchise);
         addPopupLayout.add(header, addFranchise, btnAddFranchise);
         addPopup.add(addPopupLayout);
         updPopup.add(updPopupLayout);
@@ -81,7 +82,14 @@ public class franchiseInfo extends VerticalLayout {
             });
             btnEdit.addClickListener(buttonClickEvent -> {
                 id=item.getID_Franchise();
-                updPopup.open();
+                header.setText("Изменение данных");
+                //addPopupLayout.add(header1);
+                addPopupLayout.add(btnUpdFranchise);
+                addPopupLayout.remove(btnAddFranchise);
+                //addPopupLayout.remove(header1);
+
+                pressFlag = true;
+                addPopup.open();
 
             });
             HorizontalLayout layout1 = new HorizontalLayout();
@@ -89,10 +97,21 @@ public class franchiseInfo extends VerticalLayout {
             return layout1;
         }).setTextAlign(ColumnTextAlign.END).setFrozenToEnd(true).setHeader(btnAdd);
         btnAdd.addClickListener(buttonClickEvent -> {
+            if (pressFlag==true){
+                //addPopupLayout.add(header);
+                header.setText("Добавление данных");
+                addPopupLayout.add(btnAddFranchise);
+                addPopupLayout.remove(btnUpdFranchise);
+                //addPopupLayout.remove(header1);
+
+            }
+            pressFlag = false;
+
+
             addPopup.open();
         });
         binder.forField(addFranchise).asRequired("Заполните поле 'Наименование франшизы'").bind(modelFranchise::getFranchise_Name, modelFranchise::setFranchise_Name);
-        binder.forField(updFranchise).asRequired("Заполните поле 'Наименование франшизы'").bind(modelFranchise::getFranchise_Name, modelFranchise::setFranchise_Name);
+       // binder.forField(updFranchise).asRequired("Заполните поле 'Наименование франшизы'").bind(modelFranchise::getFranchise_Name, modelFranchise::setFranchise_Name);
         binder.addStatusChangeListener(e -> btnAddFranchise.setEnabled(binder.isValid()));
         //binder.addStatusChangeListener(e -> btnUpdFranchise.setEnabled(binder.isValid()));
         btnAddFranchise.addClickListener(buttonClickEvent -> {
