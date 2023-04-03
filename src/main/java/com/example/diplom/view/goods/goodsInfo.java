@@ -247,10 +247,6 @@ public class goodsInfo extends VerticalLayout {
        binder.addStatusChangeListener(e -> btnAddGood.setEnabled(binder.isValid()));
         btnAddGood.addClickListener(buttonClickEvent -> {
             try {
-//                modelPhoto modelPhoto = new modelPhoto();
-//                modelPhoto.setPhoto_Path(absolutePath);
-                //photoRepository.save(modelPhoto);
-                //photoID=modelPhoto.getID_Photo();
                 submitRequest(bytes);
                 bytes.clear();
 

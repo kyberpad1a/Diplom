@@ -1,4 +1,4 @@
-package com.example.diplom.view.goods;
+package com.example.diplom.view.user;
 
 import com.example.diplom.view.auth.loginPage;
 import com.vaadin.flow.component.Component;
@@ -16,16 +16,15 @@ import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.router.RouterLink;
 
 import java.util.Optional;
-@Route(value = "/goods")
-@RouteAlias(value = "/")
-public class goodsPage extends AppLayout {
+@Route(value = "/user")
+
+public class userPage extends AppLayout {
     private final Tabs menu;
     private H1 viewTitle;
-    public goodsPage(){
+    public userPage(){
         setPrimarySection(AppLayout.Section.DRAWER);
 
         // Make the nav bar a header
@@ -50,8 +49,8 @@ public class goodsPage extends AppLayout {
 
         // Placeholder for the title of the current view.
         // The title will be set after navigation.
-        viewTitle = new H1();
-        layout.add(viewTitle);
+//        viewTitle = new H1();
+//        layout.add(viewTitle);
 
         // A user icon
         //layout.add(new Image("images/logo", "Avatar"));
@@ -93,9 +92,9 @@ public class goodsPage extends AppLayout {
     }
 
     private Component[] createMenuItems() {
-        return new Tab[] { createTab("Товары", goodsInfo.class),
-                createTab("Категории", categoryInfo.class),
-                createTab("Франшизы", franchiseInfo.class),
+        return new Tab[] { createTab("Товары", userGoodsPage.class),
+                //createTab("Корзина", categoryInfo.class),
+                //createTab("Франшизы", franchiseInfo.class),
                 //createTab("Card List", CardListView.class),
                 createTab("Log out", loginPage.class) };
     }
@@ -118,7 +117,7 @@ public class goodsPage extends AppLayout {
         getTabForComponent(getContent()).ifPresent(menu::setSelectedTab);
 
         // Set the view title in the header
-        viewTitle.setText(getCurrentPageTitle());
+        //viewTitle.setText(getCurrentPageTitle());
     }
     private Optional<Tab> getTabForComponent(Component component) {
         return menu.getChildren()

@@ -1,13 +1,11 @@
 package com.example.diplom.view.auth;
 
-import com.example.diplom.view.user.user;
+import com.example.diplom.view.goods.goodsPage;
+import com.example.diplom.view.user.userPage;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -15,16 +13,12 @@ import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
-import com.vaadin.flow.theme.Theme;
-import com.vaadin.flow.theme.lumo.Lumo;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import java.io.InputStream;
 
 @Route("/login")
 //@CssImport(value = "")
@@ -52,10 +46,10 @@ public class loginPage extends VerticalLayout {
 
                     //Access to view by role
                     if (authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(role -> role.equals("USER"))) {
-                        UI.getCurrent().navigate(user.class);
+                        UI.getCurrent().navigate(userPage.class);
                     } else
-                        if (authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(role -> role.equals("ADMIN"))){
-                            UI.getCurrent().navigate(user.class);
+                        if (authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(role -> role.equals("GOODSSTAFF"))){
+                            UI.getCurrent().navigate(goodsPage.class);
                     }
                 }}
             catch (AuthenticationException ex) { //

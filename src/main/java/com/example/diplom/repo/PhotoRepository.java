@@ -10,7 +10,5 @@ import java.util.Optional;
 
 @Repository
 public interface PhotoRepository extends JpaRepository<modelPhoto, Long> {
-//    public modelPhoto deleteAllByGood(Long id);
-//    public modelPhoto deleteAllByGoodOrderByID_PhotoDesc(Optional<modelGood> id);
-//    public modelPhoto findAllByGood(Optional<modelGood> id);
+    public modelPhoto findFirstByGood_ID_Good(Long ID);
 }

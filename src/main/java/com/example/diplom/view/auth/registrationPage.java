@@ -2,10 +2,7 @@ package com.example.diplom.view.auth;
 
 
 import com.example.diplom.model.modelUser;
-import com.example.diplom.model.roleEnum;
-import com.example.diplom.repo.UserRepository;
 import com.example.diplom.service.registrationService;
-import com.example.diplom.view.user.user;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
@@ -14,17 +11,13 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.shared.Tooltip;
+import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Route;
-import org.hibernate.AnnotationException;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Service;
-
-import javax.validation.ConstraintViolationException;
-import java.util.Collections;
 
 @Route("/registration")
 public class registrationPage extends VerticalLayout {
@@ -66,6 +59,11 @@ public class registrationPage extends VerticalLayout {
         patronymicField.setPlaceholder("Введите отчество");
         patronymicField.addClassName("bordered");
         patronymicField.setWidth("100%");
+
+        EmailField emailField = new EmailField("Адрес электронной почты");
+        emailField.setPlaceholder("Введите адрес эл. почты");
+        emailField.addClassName("bordered");
+        emailField.setWidth("100%");
 
         TextField username = new TextField("Логин");
         username.setPlaceholder("Введите логин");
@@ -110,6 +108,10 @@ public class registrationPage extends VerticalLayout {
         });
         binder.forField(username).asRequired("Заполните поле 'Логин'").bind(modelUser::getUsername, modelUser::setUsername);
         binder.forField(password).asRequired("Заполните поле 'Пароль'").bind(modelUser::getPassword, modelUser::setPassword);
+        binder.forField(surnameField).asRequired("Заполните поле 'Фамилия'").bind(modelUser::getSurname, modelUser::setSurname);
+        binder.forField(nameField).asRequired("Заполните поле 'Имя'").bind(modelUser::getName, modelUser::setName);
+        binder.forField(patronymicField).bind(modelUser::getPatronymic, modelUser::setPatronymic);
+        binder.forField(emailField).asRequired("Заполните поле 'Адрес эл. почты'").bind(modelUser::getEmail, modelUser::setEmail);
         binder.addStatusChangeListener(e -> btnRegister.setEnabled(binder.isValid()));
         HorizontalLayout btns = new HorizontalLayout(btnRegister, btnBack);
         btns.setWidthFull();
