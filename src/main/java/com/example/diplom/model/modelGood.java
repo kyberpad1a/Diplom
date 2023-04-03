@@ -26,6 +26,8 @@ public class modelGood {
     @NotBlank
     @Size(min = 10, max = 1000)
     private String Good_Description;
+
+    private boolean logicalFlag;
     @NotNull
     @ManyToOne(optional = true, cascade = CascadeType.MERGE)
     private modelFranchise franchise;
@@ -100,12 +102,21 @@ public class modelGood {
         this.usedPhotos = usedPhotos;
     }
 
-    public modelGood(Long ID_Good, String good_Name, String good_Material, double good_Price, String good_Description, modelFranchise franchise, modelCategory category, Collection<modelPhoto> usedPhotos) {
+    public boolean isLogicalFlag() {
+        return logicalFlag;
+    }
+
+    public void setLogicalFlag(boolean logicalFlag) {
+        this.logicalFlag = logicalFlag;
+    }
+
+    public modelGood(Long ID_Good, String good_Name, String good_Material, double good_Price, String good_Description, boolean logicalFlag, modelFranchise franchise, modelCategory category, Collection<modelPhoto> usedPhotos) {
         this.ID_Good = ID_Good;
         Good_Name = good_Name;
         Good_Material = good_Material;
         Good_Price = good_Price;
         Good_Description = good_Description;
+        this.logicalFlag = logicalFlag;
         this.franchise = franchise;
         this.category = category;
         this.usedPhotos = usedPhotos;

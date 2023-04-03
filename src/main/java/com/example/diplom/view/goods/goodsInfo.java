@@ -3,6 +3,7 @@ package com.example.diplom.view.goods;
 import com.example.diplom.model.modelCategory;
 import com.example.diplom.model.modelFranchise;
 import com.example.diplom.model.modelGood;
+import com.example.diplom.model.modelPhoto;
 import com.example.diplom.repo.CategoryRepository;
 import com.example.diplom.repo.FranchiseRepository;
 import com.example.diplom.repo.GoodRepository;
@@ -45,6 +46,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -56,9 +58,12 @@ public class goodsInfo extends VerticalLayout {
     private int charLimit = 1000;
     private Long photoID;
     Long id;
+
+    Iterable<Long> ID;
     private Binder<modelGood> binder = new BeanValidationBinder<>(modelGood.class);
     private List<byte[]> bytes;
     Grid<modelGood> grid = new Grid<>(modelGood.class, false);
+    modelGood modelGoodDelete;
 
 
 
@@ -66,10 +71,13 @@ public class goodsInfo extends VerticalLayout {
         service.addGood(binder.getBean(), bytes);
     }
     private boolean pressFlag;
+    private VerticalLayout layout;
 
     private void updateRequest(){
         service.updateGood(binder.getBean(), id);
     }
+
+    private void deleteRequest(modelGood good){service.logicalDelete(good, id);}
 
     private void init() {
         binder.setBean(new modelGood());
@@ -182,9 +190,17 @@ public class goodsInfo extends VerticalLayout {
         grid.addComponentColumn(item -> {
             Button btnEdit = new Button(new Icon(VaadinIcon.EDIT));
             Button btnDelete =new Button(new Icon(VaadinIcon.CLOSE));
+           // btnDelete.setVisible(false);
             btnDelete.addClickListener(buttonClickEvent -> {
-                repository.delete(item);
-                grid.setItems(repository.findAll());
+                id = item.getID_Good();
+
+                deleteRequest(item);
+                init();
+
+
+                //grid.setItems(repository.findAllByLogicalFlagFalse());
+                gridRefresh(repository);
+
             });
             btnEdit.addClickListener(buttonClickEvent -> {
                 id=item.getID_Good();
@@ -193,6 +209,8 @@ public class goodsInfo extends VerticalLayout {
                 addPopupLayout.add(btnUpdGood);
                 addPopupLayout.remove(btnAddGood);
                 //addPopupLayout.remove(header1);
+                addPopupLayout.remove(multiFileUpload);
+                addPopupLayout.remove(label);
 
                 pressFlag = true;
                 addPopup.open();
@@ -208,6 +226,9 @@ public class goodsInfo extends VerticalLayout {
                 header.setText("Добавление данных");
                 addPopupLayout.add(btnAddGood);
                 addPopupLayout.remove(btnUpdGood);
+                addPopupLayout.add(label);
+                addPopupLayout.add(multiFileUpload);
+
                 //addPopupLayout.remove(header1);
 
             }
@@ -234,7 +255,7 @@ public class goodsInfo extends VerticalLayout {
                 bytes.clear();
 
                 init();
-                grid.setItems(repository.findAll());
+                gridRefresh(repository);
                 Notification.show("Успешно добавлено", 3000, Notification.Position.BOTTOM_CENTER);
                 addPopup.close();
             }
@@ -247,7 +268,8 @@ public class goodsInfo extends VerticalLayout {
             try{
                 updateRequest();
                 init();
-                grid.setItems(repository.findAll());
+
+                gridRefresh(repository);
                 Notification.show("Успешно изменено", 3000, Notification.Position.BOTTOM_CENTER);
                 updPopup.close();}
             catch (DataIntegrityViolationException ex){
@@ -255,12 +277,30 @@ public class goodsInfo extends VerticalLayout {
             }
         });
         init();
-        grid.setItems(repository.findAll());
+
+        gridRefresh(repository);
         //grid.setDataProvider(dataProvider);
         layout.add(grid);
         add(layout);
 
     }
+
+    private void gridRefresh(GoodRepository repository)
+    {
+        try{
+            if (repository.findAllByLogicalFlagFalse()!=null)
+            {grid.setItems(repository.findAllByLogicalFlagFalse());}
+            else {
+                remove(layout);
+            }
+        }
+        catch (NullPointerException ex){
+            Notification.show("Товары отсутствуют", 10000, Notification.Position.BOTTOM_CENTER);
+            grid.setItems(Collections.emptyList());
+        }
+
+    }
+
     private static ComponentRenderer<GoodDetailsFormLayout, modelGood> createGoodDetailsRenderer() {
         return new ComponentRenderer<>(
                 GoodDetailsFormLayout::new,

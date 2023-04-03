@@ -86,7 +86,7 @@ public class loginPage extends VerticalLayout {
         add(loginPageLayout);
         Image backgroundImage = new Image("./images/Screenshot_2.png", "Login Background");
         backgroundImage.setWidth("100%");
-        backgroundImage.setHeight("700px");
+        backgroundImage.setHeight("650px");
 
 
 
