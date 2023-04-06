@@ -1,9 +1,7 @@
 package com.example.diplom.repo;
 
-import com.example.diplom.model.modelGood;
 import com.example.diplom.model.modelPhoto;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;

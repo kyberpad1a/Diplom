@@ -39,6 +39,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.annotation.Secured;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -49,7 +50,7 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
-
+@Secured({"GOODSSTAFF"})
 @PageTitle("Информация о товарах")
 @Route(value = "/goodsInfo", layout = goodsPage.class)
 public class goodsInfo extends VerticalLayout {

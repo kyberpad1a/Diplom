@@ -93,7 +93,7 @@ public class userPage extends AppLayout {
 
     private Component[] createMenuItems() {
         return new Tab[] { createTab("Товары", userGoodsPage.class),
-                //createTab("Корзина", categoryInfo.class),
+                createTab("Корзина", shoppingCart.class),
                 //createTab("Франшизы", franchiseInfo.class),
                 //createTab("Card List", CardListView.class),
                 createTab("Log out", loginPage.class) };

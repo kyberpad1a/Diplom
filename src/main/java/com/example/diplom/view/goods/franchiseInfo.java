@@ -23,8 +23,10 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.annotation.Secured;
 
 @PageTitle("Франшизы")
+@Secured("GOODSSTAFF")
 @Route(value = "/franchiseInfo", layout = goodsPage.class)
 public class franchiseInfo extends VerticalLayout {
     private transient franchiseService service;

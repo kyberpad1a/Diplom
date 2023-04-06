@@ -24,11 +24,13 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.annotation.Secured;
 
 import java.util.Collection;
 import java.util.List;
 
 @PageTitle("Категории")
+@Secured("GOODSSTAFF")
 @Route(value = "/categoryInfo", layout = goodsPage.class)
 public class categoryInfo extends VerticalLayout {
     private transient categoryService service;

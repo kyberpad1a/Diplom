@@ -18,10 +18,12 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.router.RouterLink;
+import org.springframework.security.access.annotation.Secured;
 
 import java.util.Optional;
 @Route(value = "/goods")
 @RouteAlias(value = "/")
+@Secured("GOODSSTAFF")
 public class goodsPage extends AppLayout {
     private final Tabs menu;
     private H1 viewTitle;
