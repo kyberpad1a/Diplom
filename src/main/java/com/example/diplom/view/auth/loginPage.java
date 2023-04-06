@@ -54,7 +54,8 @@ public class loginPage extends VerticalLayout {
                             UI.getCurrent().navigate(goodsInfo.class);
                     }
                 }}
-            catch (AuthenticationException ex) { //
+            catch (AuthenticationException ex) {
+               // Notification.show(ex.toString());
                 Notification.show("Неверное имя пользователя или пароль");
             }
 
@@ -67,9 +68,9 @@ public class loginPage extends VerticalLayout {
             UI.getCurrent().navigate(registrationPage.class);
         });
         H1 label = new H1("Авторизация");
-        RouterLink forgotPwd = new RouterLink("Забыли пароль?", restorePage.class);
+        //RouterLink forgotPwd = new RouterLink("Забыли пароль?", restorePage.class);
         HorizontalLayout btns = new HorizontalLayout(loginButton, registerButton);
-        VerticalLayout loginFormLayout = new VerticalLayout(label, usernameField, passwordField, btns, forgotPwd
+        VerticalLayout loginFormLayout = new VerticalLayout(label, usernameField, passwordField, btns
         );
         loginFormLayout.setHeightFull();
         loginFormLayout.setMargin(true);

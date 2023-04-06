@@ -27,8 +27,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private DataSource dataSource;
     private static final String LOGIN_PROCESSING_URL = "/login";
     private static final String LOGIN_FAILURE_URL = "/login?error";
-    @Autowired
-    private UserDetailsService userDetailsService;
+
     private static final String LOGIN_URL = "/login";
     private static final String LOGOUT_SUCCESS_URL = "/login";
 
@@ -63,7 +62,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.jdbcAuthentication().dataSource(dataSource).passwordEncoder(getPasswordEncoder())
                 .usersByUsernameQuery("select username, password, active from model_user where username =?")
-                .authoritiesByUsernameQuery("select u.username, ur.roles from model_user u inner join user_role ur on u.id_user = ur.user_id where u.username=?");
+                .authoritiesByUsernameQuery("select u.username, ur.roles from model_user u inner join user_role ur on u.iduser = ur.user_id where u.username=?");
     }
 
     @Bean

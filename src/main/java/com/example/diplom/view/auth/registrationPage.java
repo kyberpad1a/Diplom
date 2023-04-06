@@ -120,7 +120,7 @@ public class registrationPage extends VerticalLayout {
         btns.setAlignItems(Alignment.CENTER);
 
 //        VerticalLayout fieldLayout = new VerticalLayout(surnameField, nameField, patronymicField, loginField, passwordField, confirmPasswordField, btns);
-        VerticalLayout fieldLayout = new VerticalLayout(heading, username, password, confirmPasswordField, btns);
+        VerticalLayout fieldLayout = new VerticalLayout(heading,  surnameField, nameField, patronymicField, emailField, username, password, confirmPasswordField, btns);
         HorizontalLayout imageLayout = new HorizontalLayout(leftImage, fieldLayout, rightImage);
         imageLayout.setAlignItems(Alignment.CENTER);
         imageLayout.setSizeFull();

@@ -1,29 +1,30 @@
 package com.example.diplom.view.user;
 
 import com.example.diplom.model.modelGood;
+import com.example.diplom.model.modelOrder;
+import com.example.diplom.model.modelOrderGood;
 import com.example.diplom.model.modelPhoto;
-import com.example.diplom.repo.GoodRepository;
-import com.example.diplom.repo.PhotoRepository;
-import com.vaadin.flow.component.Text;
+import com.example.diplom.repo.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.StreamResource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.ByteArrayInputStream;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Optional;
 
 @Route(value = "/gooddetails", layout = userPage.class)
 public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long> {
@@ -33,8 +34,22 @@ public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long
 
     @Autowired
     PhotoRepository photoRepository;
+
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    OrderRepository orderRepository;
+
+    @Autowired
+    OrderGoodRepository orderGoodRepository;
+
+    private Long id;
+
     @Override
     public void setParameter(BeforeEvent beforeEvent, Long aLong) {
+
+
         modelGood good = repository.findByIDGood(aLong);
         VerticalLayout content = new VerticalLayout();
         content.setAlignSelf(Alignment.CENTER);
@@ -113,9 +128,46 @@ public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long
         content.add(price);
 
         // Добавляем кнопку "Купить"
-        Button buyButton = new Button("Купить", event -> {
+        Button buyButton = new Button("Добавить в корзину", event -> {
 
-            Notification.show("Ваш заказ принят. Спасибо!");
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            id = userRepository.findByUsername(username).getIDUser();
+            if (!orderRepository.existsByPaymentStatusIsFalseAndUser_IDUser(id)) {
+                modelOrder modelOrder = new modelOrder();
+                LocalDate localDate = LocalDate.now();
+                Date date = Date.valueOf(localDate);
+                modelOrder.setOrder_Date(date);
+                modelOrder.setUser(userRepository.findByUsername(username));
+                modelOrder.setPaymentStatus(false);
+                orderRepository.save(modelOrder);
+
+                modelOrderGood modelOrderGood = new modelOrderGood();
+                modelOrderGood.setGoodQuantity(1);
+                modelOrderGood.setGoods(repository.findByIDGood(aLong));
+                modelOrderGood.setOrder(orderRepository.findByPaymentStatusIsFalseAndUser_IDUser(id));
+                orderGoodRepository.save(modelOrderGood);
+               // Notification.show(username);
+                Notification.show("Товар добавлен в корзину!");
+            }
+            else{
+
+                if (orderGoodRepository.findByGoods_IDGoodAndOrder_User_IDUser(aLong, id)==null){
+                    modelOrderGood modelOrderGood = new modelOrderGood();
+                    modelOrderGood.setGoodQuantity(1);
+                    modelOrderGood.setGoods(repository.findByIDGood(aLong));
+                    modelOrderGood.setOrder(orderRepository.findByPaymentStatusIsFalseAndUser_IDUser(id));
+                    orderGoodRepository.save(modelOrderGood);
+                }
+                else {
+                    modelOrderGood modelOrderGood = orderGoodRepository.findByGoods_IDGoodAndOrder_User_IDUser(aLong, id);
+                    modelOrderGood.setGoodQuantity(modelOrderGood.getGoodQuantity()+1);
+                    modelOrderGood.setOrder(modelOrderGood.getOrder());
+                    modelOrderGood.setGoods(modelOrderGood.getGoods());
+                    orderGoodRepository.save(modelOrderGood);
+                }
+                Notification.show("Товар добавлен в корзину");
+            }
         });
         content.add(buyButton);
         add(content);

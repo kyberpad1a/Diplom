@@ -35,8 +35,11 @@ public class modelGood {
     @ManyToOne(optional = true, cascade = CascadeType.MERGE)
     private modelCategory category;
 
-    @OneToMany(mappedBy = "good", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "good", fetch = FetchType.LAZY)
     private Collection<modelPhoto> usedPhotos;
+
+    @OneToMany(mappedBy = "goods", fetch = FetchType.LAZY)
+    private Collection<modelOrderGood> orderGoodCollection;
 
     public Long getIDGood() {
         return IDGood;
@@ -110,7 +113,15 @@ public class modelGood {
         this.logicalFlag = logicalFlag;
     }
 
-    public modelGood(Long IDGood, String good_Name, String good_Material, double good_Price, String good_Description, boolean logicalFlag, modelFranchise franchise, modelCategory category, Collection<modelPhoto> usedPhotos) {
+    public Collection<modelOrderGood> getOrderGoodCollection() {
+        return orderGoodCollection;
+    }
+
+    public void setOrderGoodCollection(Collection<modelOrderGood> orderGoodCollection) {
+        this.orderGoodCollection = orderGoodCollection;
+    }
+
+    public modelGood(Long IDGood, String good_Name, String good_Material, double good_Price, String good_Description, boolean logicalFlag, modelFranchise franchise, modelCategory category, Collection<modelPhoto> usedPhotos, Collection<modelOrderGood> orderGoodCollection) {
         this.IDGood = IDGood;
         Good_Name = good_Name;
         Good_Material = good_Material;
@@ -120,5 +131,6 @@ public class modelGood {
         this.franchise = franchise;
         this.category = category;
         this.usedPhotos = usedPhotos;
+        this.orderGoodCollection = orderGoodCollection;
     }
 }

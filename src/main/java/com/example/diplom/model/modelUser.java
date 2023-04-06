@@ -16,7 +16,7 @@ public class modelUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long ID_User;
+    private Long IDUser;
     @Column(unique = true)
     @NotBlank
     @NotNull
@@ -45,14 +45,32 @@ public class modelUser {
     @Enumerated(EnumType.STRING)
     private Set<roleEnum> roles;
 
-    public modelUser(){}
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    private Collection<modelOrder> orderCollection;
 
-    public Long getID_User() {
-        return ID_User;
+    public modelUser() {
     }
 
-    public void setID_User(Long ID_User) {
-        this.ID_User = ID_User;
+    public modelUser(Long IDUser, String username, String password, String surname, String name, String patronymic, String email, String resettoken, boolean active, Set<roleEnum> roles, Collection<modelOrder> orderCollection) {
+        this.IDUser = IDUser;
+        this.username = username;
+        this.password = password;
+        this.surname = surname;
+        this.name = name;
+        this.patronymic = patronymic;
+        this.email = email;
+        this.resettoken = resettoken;
+        this.active = active;
+        this.roles = roles;
+        this.orderCollection = orderCollection;
+    }
+
+    public Long getIDUser() {
+        return IDUser;
+    }
+
+    public void setIDUser(Long IDUser) {
+        this.IDUser = IDUser;
     }
 
     public String getUsername() {
@@ -69,22 +87,6 @@ public class modelUser {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public Set<roleEnum> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<roleEnum> roles) {
-        this.roles = roles;
     }
 
     public String getSurname() {
@@ -127,15 +129,27 @@ public class modelUser {
         this.resettoken = resettoken;
     }
 
-    public modelUser(String username, String password, String surname, String name, String patronymic, String email, String resettoken, boolean active, Set<roleEnum> roles) {
-        this.username = username;
-        this.password = password;
-        this.surname = surname;
-        this.name = name;
-        this.patronymic = patronymic;
-        this.email = email;
-        this.resettoken = resettoken;
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public Set<roleEnum> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<roleEnum> roles) {
         this.roles = roles;
+    }
+
+    public Collection<modelOrder> getOrderCollection() {
+        return orderCollection;
+    }
+
+    public void setOrderCollection(Collection<modelOrder> orderCollection) {
+        this.orderCollection = orderCollection;
     }
 }
