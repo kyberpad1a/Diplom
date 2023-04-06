@@ -192,7 +192,7 @@ public class goodsInfo extends VerticalLayout {
             Button btnDelete =new Button(new Icon(VaadinIcon.CLOSE));
            // btnDelete.setVisible(false);
             btnDelete.addClickListener(buttonClickEvent -> {
-                id = item.getID_Good();
+                id = item.getIDGood();
 
                 deleteRequest(item);
                 init();
@@ -203,7 +203,7 @@ public class goodsInfo extends VerticalLayout {
 
             });
             btnEdit.addClickListener(buttonClickEvent -> {
-                id=item.getID_Good();
+                id=item.getIDGood();
                 header.setText("Изменение данных");
                 //addPopupLayout.add(header1);
                 addPopupLayout.add(btnUpdGood);

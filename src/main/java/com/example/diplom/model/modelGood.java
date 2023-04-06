@@ -10,7 +10,7 @@ public class modelGood {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long ID_Good;
+    private Long IDGood;
     @NotNull
     @NotBlank
     private String Good_Name;
@@ -38,12 +38,12 @@ public class modelGood {
     @OneToMany(mappedBy = "good", fetch = FetchType.EAGER)
     private Collection<modelPhoto> usedPhotos;
 
-    public Long getID_Good() {
-        return ID_Good;
+    public Long getIDGood() {
+        return IDGood;
     }
 
-    public void setID_Good(Long ID_Good) {
-        this.ID_Good = ID_Good;
+    public void setIDGood(Long IDGood) {
+        this.IDGood = IDGood;
     }
 
     public String getGood_Name() {
@@ -110,8 +110,8 @@ public class modelGood {
         this.logicalFlag = logicalFlag;
     }
 
-    public modelGood(Long ID_Good, String good_Name, String good_Material, double good_Price, String good_Description, boolean logicalFlag, modelFranchise franchise, modelCategory category, Collection<modelPhoto> usedPhotos) {
-        this.ID_Good = ID_Good;
+    public modelGood(Long IDGood, String good_Name, String good_Material, double good_Price, String good_Description, boolean logicalFlag, modelFranchise franchise, modelCategory category, Collection<modelPhoto> usedPhotos) {
+        this.IDGood = IDGood;
         Good_Name = good_Name;
         Good_Material = good_Material;
         Good_Price = good_Price;

@@ -10,5 +10,5 @@ import java.util.Optional;
 
 @Repository
 public interface PhotoRepository extends JpaRepository<modelPhoto, Long> {
-    public modelPhoto findFirstByGood_ID_Good(Long ID);
+    public modelPhoto findFirstByGood_IDGood(Long ID);
 }

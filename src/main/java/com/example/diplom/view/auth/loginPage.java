@@ -1,6 +1,8 @@
 package com.example.diplom.view.auth;
 
+import com.example.diplom.view.goods.goodsInfo;
 import com.example.diplom.view.goods.goodsPage;
+import com.example.diplom.view.user.userGoodsPage;
 import com.example.diplom.view.user.userPage;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -46,10 +48,10 @@ public class loginPage extends VerticalLayout {
 
                     //Access to view by role
                     if (authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(role -> role.equals("USER"))) {
-                        UI.getCurrent().navigate(userPage.class);
+                        UI.getCurrent().navigate(userGoodsPage.class);
                     } else
                         if (authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(role -> role.equals("GOODSSTAFF"))){
-                            UI.getCurrent().navigate(goodsPage.class);
+                            UI.getCurrent().navigate(goodsInfo.class);
                     }
                 }}
             catch (AuthenticationException ex) { //
