@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface GoodRepository extends JpaRepository<modelGood, Long> {
     public Collection<modelGood> findAllByLogicalFlagFalse();
+    public modelGood findByIDGood(Long id);
 }

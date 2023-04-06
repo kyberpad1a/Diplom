@@ -38,7 +38,7 @@ public class userGoodsPage extends VerticalLayout {
         for (modelGood good : goods) {
 
             VerticalLayout goodLayout = new VerticalLayout();
-            RouterLink details = new RouterLink("Подробнее", userGoodsPage.class);
+            RouterLink details = new RouterLink("Подробнее", goodsDetails.class, good.getIDGood());
             goodLayout.setWidth("200px");
             goodLayout.setSizeUndefined();
             id = good.getIDGood();
@@ -52,14 +52,15 @@ public class userGoodsPage extends VerticalLayout {
             //descriptionArea.setReadOnly(true);
 
             // Добавляем компоненты в компонент задачи
-            goodLayout.add(image, nameLabel, priceLabel);
-            goodLayout.setFlexGrow(1.0, nameLabel, priceLabel);
+            goodLayout.add(image, nameLabel, priceLabel, details);
+            goodLayout.setFlexGrow(1.0, nameLabel, priceLabel, details);
             goodLayout.setAlignSelf(FlexLayout.Alignment.CENTER, nameLabel);
             layout.add(goodLayout);
         }
         layout.setJustifyContentMode(JustifyContentMode.AROUND);
         layout.setAlignItems(FlexLayout.Alignment.CENTER);
         add(layout);
+
     }
 
     public Image generateImage(Long GoodID) {
