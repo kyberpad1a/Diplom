@@ -9,6 +9,7 @@ import com.example.diplom.repo.FranchiseRepository;
 import com.example.diplom.repo.GoodRepository;
 import com.example.diplom.repo.PhotoRepository;
 import com.example.diplom.service.goodService;
+import com.example.diplom.view.DeniedAccessView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -34,12 +35,17 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -50,10 +56,10 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
-@Secured({"GOODSSTAFF"})
+
 @PageTitle("Информация о товарах")
 @Route(value = "/goodsInfo", layout = goodsPage.class)
-public class goodsInfo extends VerticalLayout {
+public class goodsInfo extends VerticalLayout implements BeforeEnterObserver {
     private transient goodService service;
     private String absolutePath;
     private int charLimit = 1000;
@@ -95,11 +101,12 @@ public class goodsInfo extends VerticalLayout {
 
         Upload multiFileUpload = new Upload(multiFileBuffer);
         multiFileUpload.setAcceptedFileTypes("image/jpeg","image/jpg", "image/png", "image/gif");
+        multiFileUpload.setMaxFiles(5);
 
         multiFileUpload.addSucceededListener(event -> {
             String attachmentName = event.getFileName();
             try {
-                // The image can be jpg png or gif, but we store it always as png file in this example
+
                 BufferedImage inputImage = ImageIO.read(multiFileBuffer.getInputStream(attachmentName));
                 ByteArrayOutputStream pngContent = new ByteArrayOutputStream();
                 ImageIO.write(inputImage, "png", pngContent);
@@ -163,9 +170,9 @@ public class goodsInfo extends VerticalLayout {
 
         FormLayout addPopupLayout = new FormLayout();
         addPopupLayout.setResponsiveSteps(
-                // Use one column by default
+
                 new FormLayout.ResponsiveStep("0", 1),
-                // Use two columns, if layout's width exceeds 500px
+
                 new FormLayout.ResponsiveStep("500px", 2));
         addPopupLayout.setColspan(addDescription, 2);
         addPopupLayout.setColspan(multiFileUpload, 2);
@@ -303,6 +310,17 @@ public class goodsInfo extends VerticalLayout {
                 GoodDetailsFormLayout::new,
                 GoodDetailsFormLayout::setGood);
     }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (beforeEnterEvent.getNavigationTarget() != DeniedAccessView.class &&
+                authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).noneMatch(role -> role.equals("GOODSSTAFF"))) {
+            beforeEnterEvent.rerouteTo(DeniedAccessView.class);
+        }
+    }
+
 
     private static class GoodDetailsFormLayout extends FormLayout {
         TextField addGoodName = new TextField("Наименование товара");

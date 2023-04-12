@@ -1,8 +1,10 @@
 package com.example.diplom.view.user;
 
+import com.example.diplom.view.DeniedAccessView;
 import com.example.diplom.view.auth.loginPage;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.html.H1;
@@ -14,46 +16,48 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.router.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
+import javax.annotation.security.RolesAllowed;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
+
 @Route(value = "/user")
 
-public class userPage extends AppLayout {
+public class userPage extends AppLayout implements BeforeEnterObserver {
+
     private final Tabs menu;
     private H1 viewTitle;
-    public userPage(){
+    @Autowired
+    private HttpServletRequest req;
+
+    public userPage() {
+
+
         setPrimarySection(AppLayout.Section.DRAWER);
 
-        // Make the nav bar a header
         addToNavbar(true, createHeaderContent());
 
-        // Put the menu in the drawer
         menu = createMenu();
         addToDrawer(createDrawerContent(menu));
     }
+
     private Component createHeaderContent() {
         HorizontalLayout layout = new HorizontalLayout();
 
-        // Configure styling for the header
+
         layout.setId("header");
         layout.getThemeList().set("light", true);
         layout.setWidthFull();
         layout.setSpacing(false);
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
 
-        // Have the drawer toggle button on the left
         layout.add(new DrawerToggle());
 
-        // Placeholder for the title of the current view.
-        // The title will be set after navigation.
-//        viewTitle = new H1();
-//        layout.add(viewTitle);
-
-        // A user icon
-        //layout.add(new Image("images/logo", "Avatar"));
 
         return layout;
     }
@@ -61,14 +65,14 @@ public class userPage extends AppLayout {
     private Component createDrawerContent(Tabs menu) {
         VerticalLayout layout = new VerticalLayout();
 
-        // Configure styling for the drawer
+
         layout.setSizeFull();
         layout.setPadding(false);
         layout.setSpacing(false);
         layout.getThemeList().set("spacing-s", true);
         layout.setAlignItems(FlexComponent.Alignment.STRETCH);
 
-        // Have a drawer header with an application logo
+
         HorizontalLayout logoLayout = new HorizontalLayout();
         logoLayout.setId("logo");
         Image IMG = new Image("images/logo4.png", "My Project logo");
@@ -78,10 +82,11 @@ public class userPage extends AppLayout {
         logoLayout.add(IMG);
         logoLayout.add(new H2("Логово лича"));
 
-        // Display the logo and the menu in the drawer
+
         layout.add(logoLayout, menu);
         return layout;
     }
+
     private Tabs createMenu() {
         final Tabs tabs = new Tabs();
         tabs.setOrientation(Tabs.Orientation.VERTICAL);
@@ -92,11 +97,11 @@ public class userPage extends AppLayout {
     }
 
     private Component[] createMenuItems() {
-        return new Tab[] { createTab("Товары", userGoodsPage.class),
+        return new Tab[]{createTab("Товары", userGoodsPage.class),
                 createTab("Корзина", shoppingCart.class),
                 //createTab("Франшизы", franchiseInfo.class),
                 //createTab("Card List", CardListView.class),
-                createTab("Log out", loginPage.class) };
+                createTab("Log out", loginPage.class)};
     }
 
     private static Tab createTab(String text,
@@ -106,19 +111,20 @@ public class userPage extends AppLayout {
         ComponentUtil.setData(tab, Class.class, navigationTarget);
         return tab;
     }
+
     private String getCurrentPageTitle() {
         return getContent().getClass().getAnnotation(PageTitle.class).value();
     }
+
     @Override
     protected void afterNavigation() {
         super.afterNavigation();
 
-        // Select the tab corresponding to currently shown view
+
         getTabForComponent(getContent()).ifPresent(menu::setSelectedTab);
 
-        // Set the view title in the header
-        //viewTitle.setText(getCurrentPageTitle());
     }
+
     private Optional<Tab> getTabForComponent(Component component) {
         return menu.getChildren()
                 .filter(tab -> ComponentUtil.getData(tab, Class.class)
@@ -126,4 +132,14 @@ public class userPage extends AppLayout {
                 .findFirst().map(Tab.class::cast);
     }
 
+    @Override
+    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (beforeEnterEvent.getNavigationTarget() != DeniedAccessView.class &&
+                authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).noneMatch(role -> role.equals("USER"))) {
+            beforeEnterEvent.rerouteTo(DeniedAccessView.class);
+        }
+    }
 }
+

@@ -5,6 +5,7 @@ import com.example.diplom.model.modelOrder;
 import com.example.diplom.model.modelOrderGood;
 import com.example.diplom.model.modelPhoto;
 import com.example.diplom.repo.*;
+import com.example.diplom.view.DeniedAccessView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
@@ -19,15 +20,17 @@ import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.StreamResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import javax.annotation.security.RolesAllowed;
 import java.io.ByteArrayInputStream;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.Collection;
 
 @Route(value = "/gooddetails", layout = userPage.class)
-public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long> {
+public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long>, BeforeEnterObserver {
 
     @Autowired
     GoodRepository repository;
@@ -127,7 +130,7 @@ public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long
         price.setReadOnly(true);
         content.add(price);
 
-        // Добавляем кнопку "Купить"
+
         Button buyButton = new Button("Добавить в корзину", event -> {
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -196,4 +199,15 @@ public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long
 
         return image;
     }
-}
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (beforeEnterEvent.getNavigationTarget() != DeniedAccessView.class &&
+                authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).noneMatch(role -> role.equals("USER"))) {
+            beforeEnterEvent.rerouteTo(DeniedAccessView.class);
+        }
+    }
+    }
+

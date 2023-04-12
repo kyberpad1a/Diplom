@@ -4,6 +4,7 @@ import com.example.diplom.model.modelCategory;
 import com.example.diplom.model.modelUser;
 import com.example.diplom.repo.CategoryRepository;
 import com.example.diplom.service.categoryService;
+import com.example.diplom.view.DeniedAccessView;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -20,19 +21,23 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Collection;
 import java.util.List;
 
 @PageTitle("Категории")
-@Secured("GOODSSTAFF")
 @Route(value = "/categoryInfo", layout = goodsPage.class)
-public class categoryInfo extends VerticalLayout {
+public class categoryInfo extends VerticalLayout implements BeforeEnterObserver {
     private transient categoryService service;
     Long id;
     private Binder<modelCategory> binder = new BeanValidationBinder<>(modelCategory.class);
@@ -153,5 +158,15 @@ public class categoryInfo extends VerticalLayout {
         layout.add(grid);
         add(layout);
 
+    }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (beforeEnterEvent.getNavigationTarget() != DeniedAccessView.class &&
+                authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).noneMatch(role -> role.equals("GOODSSTAFF"))) {
+            beforeEnterEvent.rerouteTo(DeniedAccessView.class);
+        }
     }
 }

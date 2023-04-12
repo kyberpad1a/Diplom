@@ -74,7 +74,7 @@ public class registrationPage extends VerticalLayout {
         password.setPlaceholder("Введите пароль");
         password.addClassName("bordered");
         password.setWidth("100%");
-       // password.setTooltipText("пароль должен быть такой-то");
+        // password.setTooltipText("пароль должен быть такой-то");
         Tooltip tooltip = password.getTooltip().withManual(true);
         password.setHelperText("yhhyhu");
 
@@ -88,18 +88,17 @@ public class registrationPage extends VerticalLayout {
 
         btnRegister.addClickListener(buttonClickEvent -> {
             try {
-            if (!confirmPasswordField.getValue().equals(password.getValue())) {
-                Notification.show("Пароли не совпадают", 3000, Notification.Position.BOTTOM_CENTER);
-            } else{
-                //Notification.show(String.format("Успешная регистрация, ", binder.getBean().getUsername()));
-                {
-                    submitRequest();
-                confirmPasswordField.setValue("");
-                init();
+                if (!confirmPasswordField.getValue().equals(password.getValue())) {
+                    Notification.show("Пароли не совпадают", 3000, Notification.Position.BOTTOM_CENTER);
+                } else {
+                    //Notification.show(String.format("Успешная регистрация, ", binder.getBean().getUsername()));
+                    {
+                        submitRequest();
+                        confirmPasswordField.setValue("");
+                        init();
+                    }
                 }
-            }
-            }
-            catch (DataIntegrityViolationException ex){
+            } catch (DataIntegrityViolationException ex) {
                 Notification.show("Пользователь с текущим логином уже существует");
             }
         });
@@ -120,7 +119,7 @@ public class registrationPage extends VerticalLayout {
         btns.setAlignItems(Alignment.CENTER);
 
 //        VerticalLayout fieldLayout = new VerticalLayout(surnameField, nameField, patronymicField, loginField, passwordField, confirmPasswordField, btns);
-        VerticalLayout fieldLayout = new VerticalLayout(heading,  surnameField, nameField, patronymicField, emailField, username, password, confirmPasswordField, btns);
+        VerticalLayout fieldLayout = new VerticalLayout(heading, surnameField, nameField, patronymicField, emailField, username, password, confirmPasswordField, btns);
         HorizontalLayout imageLayout = new HorizontalLayout(leftImage, fieldLayout, rightImage);
         imageLayout.setAlignItems(Alignment.CENTER);
         imageLayout.setSizeFull();

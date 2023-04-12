@@ -1,5 +1,6 @@
 package com.example.diplom.view.goods;
 
+import com.example.diplom.view.DeniedAccessView;
 import com.example.diplom.view.auth.loginPage;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
@@ -14,49 +15,42 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouteAlias;
-import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.router.*;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
 @Route(value = "/goods")
 @RouteAlias(value = "/")
-@Secured("GOODSSTAFF")
-public class goodsPage extends AppLayout {
+public class goodsPage extends AppLayout implements BeforeEnterObserver {
     private final Tabs menu;
     private H1 viewTitle;
     public goodsPage(){
         setPrimarySection(AppLayout.Section.DRAWER);
 
-        // Make the nav bar a header
         addToNavbar(true, createHeaderContent());
 
-        // Put the menu in the drawer
         menu = createMenu();
         addToDrawer(createDrawerContent(menu));
     }
     private Component createHeaderContent() {
         HorizontalLayout layout = new HorizontalLayout();
 
-        // Configure styling for the header
         layout.setId("header");
         layout.getThemeList().set("light", true);
         layout.setWidthFull();
         layout.setSpacing(false);
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
 
-        // Have the drawer toggle button on the left
         layout.add(new DrawerToggle());
 
-        // Placeholder for the title of the current view.
-        // The title will be set after navigation.
+
         viewTitle = new H1();
         layout.add(viewTitle);
 
-        // A user icon
-        //layout.add(new Image("images/logo", "Avatar"));
+
 
         return layout;
     }
@@ -64,14 +58,14 @@ public class goodsPage extends AppLayout {
     private Component createDrawerContent(Tabs menu) {
         VerticalLayout layout = new VerticalLayout();
 
-        // Configure styling for the drawer
+
         layout.setSizeFull();
         layout.setPadding(false);
         layout.setSpacing(false);
         layout.getThemeList().set("spacing-s", true);
         layout.setAlignItems(FlexComponent.Alignment.STRETCH);
 
-        // Have a drawer header with an application logo
+
         HorizontalLayout logoLayout = new HorizontalLayout();
         logoLayout.setId("logo");
         Image IMG = new Image("images/logo4.png", "My Project logo");
@@ -81,7 +75,7 @@ public class goodsPage extends AppLayout {
         logoLayout.add(IMG);
         logoLayout.add(new H2("Логово лича"));
 
-        // Display the logo and the menu in the drawer
+
         layout.add(logoLayout, menu);
         return layout;
     }
@@ -116,10 +110,9 @@ public class goodsPage extends AppLayout {
     protected void afterNavigation() {
         super.afterNavigation();
 
-        // Select the tab corresponding to currently shown view
+
         getTabForComponent(getContent()).ifPresent(menu::setSelectedTab);
 
-        // Set the view title in the header
         viewTitle.setText(getCurrentPageTitle());
     }
     private Optional<Tab> getTabForComponent(Component component) {
@@ -129,4 +122,15 @@ public class goodsPage extends AppLayout {
                 .findFirst().map(Tab.class::cast);
     }
 
-}
+    @Override
+    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (beforeEnterEvent.getNavigationTarget() != DeniedAccessView.class &&
+
+                authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).noneMatch(role -> role.equals("GOODSSTAFF"))) {
+            beforeEnterEvent.rerouteTo(DeniedAccessView.class);
+        }
+    }
+    }
+

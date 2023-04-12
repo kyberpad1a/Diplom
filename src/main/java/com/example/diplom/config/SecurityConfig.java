@@ -35,7 +35,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // Vaadin handles CSRF internally
         http.csrf().disable()
+                .exceptionHandling().accessDeniedPage("/accessDenied")
+                .and()
                 .authorizeRequests()
+
 
 
                 .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
