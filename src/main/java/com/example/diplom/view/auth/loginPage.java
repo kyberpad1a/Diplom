@@ -1,7 +1,9 @@
 package com.example.diplom.view.auth;
 
+import com.example.diplom.repo.UserRepository;
 import com.example.diplom.view.goods.goodsInfo;
 import com.example.diplom.view.goods.goodsPage;
+import com.example.diplom.view.management.manageUsers;
 import com.example.diplom.view.user.userGoodsPage;
 import com.example.diplom.view.user.userPage;
 import com.vaadin.flow.component.UI;
@@ -15,6 +17,7 @@ import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,10 +30,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 //@Theme("login-rich-content.css")
 public class loginPage extends VerticalLayout {
     private final AuthenticationManager authenticationManager;
+    @Autowired
+    final
+    UserRepository userRepository;
 //    @Autowired
 //    private PasswordEncoder passwordEncoder;
-    public loginPage(AuthenticationManager authenticationManager){
+    public loginPage(AuthenticationManager authenticationManager, UserRepository userRepository){
         this.authenticationManager = authenticationManager;
+        this.userRepository=userRepository;
        addClassName("login-rich-content");
         //loginForm.getElement().getThemeList().add("dark");
         TextField usernameField = new TextField("Логин");
@@ -46,13 +53,18 @@ public class loginPage extends VerticalLayout {
 
                     SecurityContextHolder.getContext().setAuthentication(authentication);
 
+
                     //Access to view by role
-                    if (authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(role -> role.equals("USER"))) {
+                    if (authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(role -> role.equals("USER")) && userRepository.existsByActiveIsTrueAndUsername(username)) {
                         UI.getCurrent().navigate(userGoodsPage.class);
                     } else
-                        if (authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(role -> role.equals("GOODSSTAFF"))){
+                        if (authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(role -> role.equals("GOODSSTAFF")) && userRepository.existsByActiveIsTrueAndUsername(username)){
                             UI.getCurrent().navigate(goodsInfo.class);
                     }
+                        else
+                        if (authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(role -> role.equals("ADMIN")) && userRepository.existsByActiveIsTrueAndUsername(username)) {
+                            UI.getCurrent().navigate(manageUsers.class);
+                        }
                 }}
             catch (AuthenticationException ex) {
                // Notification.show(ex.toString());
