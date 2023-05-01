@@ -28,7 +28,9 @@ import java.util.Optional;
 
 @Route(value = "/user")
 
-public class userPage extends AppLayout implements BeforeEnterObserver {
+public class userPage extends AppLayout
+//        implements BeforeEnterObserver
+      {
 
     private final Tabs menu;
     private H1 viewTitle;
@@ -132,14 +134,14 @@ public class userPage extends AppLayout implements BeforeEnterObserver {
                 .findFirst().map(Tab.class::cast);
     }
 
-    @Override
-    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (beforeEnterEvent.getNavigationTarget() != DeniedAccessView.class &&
-                authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).noneMatch(role -> role.equals("USER"))) {
-            beforeEnterEvent.rerouteTo(DeniedAccessView.class);
-        }
-    }
+//    @Override
+//    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//        if (beforeEnterEvent.getNavigationTarget() != DeniedAccessView.class &&
+//                authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).noneMatch(role -> role.equals("USER"))) {
+//            beforeEnterEvent.rerouteTo(DeniedAccessView.class);
+//        }
+//    }
 }
 

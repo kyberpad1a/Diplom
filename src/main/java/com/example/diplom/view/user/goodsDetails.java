@@ -30,7 +30,9 @@ import java.time.LocalDate;
 import java.util.Collection;
 
 @Route(value = "/gooddetails", layout = userPage.class)
-public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long>, BeforeEnterObserver {
+public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long>
+//        , BeforeEnterObserver
+{
 
     @Autowired
     GoodRepository repository;
@@ -200,14 +202,14 @@ public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long
         return image;
     }
 
-    @Override
-    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (beforeEnterEvent.getNavigationTarget() != DeniedAccessView.class &&
-                authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).noneMatch(role -> role.equals("USER"))) {
-            beforeEnterEvent.rerouteTo(DeniedAccessView.class);
-        }
-    }
+//    @Override
+//    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//        if (beforeEnterEvent.getNavigationTarget() != DeniedAccessView.class &&
+//                authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).noneMatch(role -> role.equals("USER"))) {
+//            beforeEnterEvent.rerouteTo(DeniedAccessView.class);
+//        }
+//    }
     }
 

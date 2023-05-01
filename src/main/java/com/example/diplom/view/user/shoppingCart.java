@@ -6,6 +6,8 @@ import com.example.diplom.repo.GoodRepository;
 import com.example.diplom.repo.OrderGoodRepository;
 import com.example.diplom.repo.UserRepository;
 import com.example.diplom.view.DeniedAccessView;
+import com.example.diplom.view.auth.loginPage;
+import com.example.diplom.view.auth.registrationPage;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
@@ -103,7 +105,11 @@ public class shoppingCart extends VerticalLayout implements BeforeEnterObserver 
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        id = userRepository.findByUsername(username).getIDUser();
+        try{id = userRepository.findByUsername(username).getIDUser();}
+        catch (NullPointerException ex){
+            UI.getCurrent().navigate(loginPage.class);
+        }
+
         try{
             if (repository.findAllByOrder_PaymentStatusAndOrder_User_IDUser(false, id)!=null)
             {grid.setItems(repository.findAllByOrder_PaymentStatusAndOrder_User_IDUser(false, id));}
@@ -122,7 +128,7 @@ public class shoppingCart extends VerticalLayout implements BeforeEnterObserver 
 
             if (beforeEnterEvent.getNavigationTarget() != DeniedAccessView.class &&
                     authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).noneMatch(role -> role.equals("USER"))) {
-                beforeEnterEvent.rerouteTo(DeniedAccessView.class);
+                beforeEnterEvent.rerouteTo(loginPage.class);
             }
         }
     }

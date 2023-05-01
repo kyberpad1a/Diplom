@@ -25,7 +25,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @PageTitle("Купите нашу продукцию")
 @Route(value = "/userGoodsPage", layout = userPage.class)
 
-public class userGoodsPage extends VerticalLayout implements BeforeEnterObserver {
+public class userGoodsPage extends VerticalLayout
+//        implements BeforeEnterObserver
+{
     Collection<modelGood> goods;
     Image image = new Image();
     @Autowired
@@ -102,17 +104,17 @@ public class userGoodsPage extends VerticalLayout implements BeforeEnterObserver
 
     }
 
-    @Override
-    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-
-
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-            if (beforeEnterEvent.getNavigationTarget() != DeniedAccessView.class &&
-                    authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).noneMatch(role -> role.equals("USER"))) {
-                beforeEnterEvent.rerouteTo(DeniedAccessView.class);
-            }
-
-    }
+//    @Override
+//    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+//
+//
+//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//            if (beforeEnterEvent.getNavigationTarget() != DeniedAccessView.class &&
+//                    authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).noneMatch(role -> role.equals("USER"))) {
+//                beforeEnterEvent.rerouteTo(DeniedAccessView.class);
+//            }
+//
+//    }
     }
 
