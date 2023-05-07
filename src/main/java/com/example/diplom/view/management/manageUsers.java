@@ -59,7 +59,10 @@ public class manageUsers extends VerticalLayout implements BeforeEnterObserver {
         binder.setBean(new modelUser());
     }
     private void updateRequest(){
-        service.updateUser(binder.getBean(), id, flag, boolflag);
+        service.updateUser(binder.getBean(), id, flag);
+    }
+    private void updateRequestActive(){
+        service.updateUserActive(binder.getBean(), id, boolflag);
     }
     Grid<modelUser> grid = new Grid<>(modelUser.class, false);
     @Autowired
@@ -109,7 +112,7 @@ public class manageUsers extends VerticalLayout implements BeforeEnterObserver {
                 else
                     boolflag =false;
                 try {
-                    updateRequest();
+                    updateRequestActive();
                 }
                 catch(DataIntegrityViolationException ex){
                     Notification.show("Изменение не завершено", 3000, Notification.Position.BOTTOM_CENTER);

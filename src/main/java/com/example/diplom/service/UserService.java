@@ -13,10 +13,9 @@ import java.util.Collections;
 public class UserService {
     @Autowired
     private UserRepository repository;
-    public void updateUser(modelUser user, Long id, String flag, boolean boolflag){
+    public void updateUser(modelUser user, Long id, String flag){
         modelUser originalmodel = repository.findById(id).orElse(null);
         if(user != null){
-            originalmodel.setActive(boolflag);
             if (flag!=null)
             {switch (flag){
                 case "ADMIN" -> originalmodel.setRoles(Collections.singleton(roleEnum.ADMIN));
@@ -25,7 +24,26 @@ public class UserService {
                 case "GOODSSTAFF" -> originalmodel.setRoles(Collections.singleton(roleEnum.GOODSSTAFF));
             }
             }
-            //originalmodel.setRoles(user.getRoles());
+            repository.save(originalmodel);
+        }
+    }
+
+    public void updateUserActive(modelUser user, Long id, boolean boolflag){
+        modelUser originalmodel = repository.findById(id).orElse(null);
+        if(user != null){
+            originalmodel.setActive(boolflag);
+            repository.save(originalmodel);
+        }
+    }
+
+    public void updateUserData(modelUser user, Long id){
+        modelUser originalmodel = repository.findById(id).orElse(null);
+        if(user != null){
+
+            originalmodel.setSurname(user.getSurname());
+            originalmodel.setName(user.getName());
+            originalmodel.setPatronymic(user.getPatronymic());
+            originalmodel.setEmail(user.getEmail());
             repository.save(originalmodel);
         }
     }
