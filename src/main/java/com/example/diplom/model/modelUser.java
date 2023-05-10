@@ -45,25 +45,15 @@ public class modelUser {
     @Enumerated(EnumType.STRING)
     private Set<roleEnum> roles;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Collection<modelOrder> orderCollection;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private Collection<ModelRating> users;
 
     public modelUser() {
     }
 
-    public modelUser(Long IDUser, String username, String password, String surname, String name, String patronymic, String email, String resettoken, boolean active, Set<roleEnum> roles, Collection<modelOrder> orderCollection) {
-        this.IDUser = IDUser;
-        this.username = username;
-        this.password = password;
-        this.surname = surname;
-        this.name = name;
-        this.patronymic = patronymic;
-        this.email = email;
-        this.resettoken = resettoken;
-        this.active = active;
-        this.roles = roles;
-        this.orderCollection = orderCollection;
-    }
 
     public Long getIDUser() {
         return IDUser;
@@ -151,5 +141,28 @@ public class modelUser {
 
     public void setOrderCollection(Collection<modelOrder> orderCollection) {
         this.orderCollection = orderCollection;
+    }
+
+    public Collection<ModelRating> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Collection<ModelRating> users) {
+        this.users = users;
+    }
+
+    public modelUser(Long IDUser, String username, String password, String surname, String name, String patronymic, String email, String resettoken, boolean active, Set<roleEnum> roles, Collection<modelOrder> orderCollection, Collection<ModelRating> users) {
+        this.IDUser = IDUser;
+        this.username = username;
+        this.password = password;
+        this.surname = surname;
+        this.name = name;
+        this.patronymic = patronymic;
+        this.email = email;
+        this.resettoken = resettoken;
+        this.active = active;
+        this.roles = roles;
+        this.orderCollection = orderCollection;
+        this.users = users;
     }
 }

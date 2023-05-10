@@ -1,5 +1,6 @@
 package com.example.diplom.view.user;
 
+import com.example.diplom.repo.GoodRepository;
 import com.example.diplom.view.DeniedAccessView;
 import com.example.diplom.view.auth.loginPage;
 import com.vaadin.flow.component.Component;
@@ -10,6 +11,7 @@ import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -36,6 +38,8 @@ public class userPage extends AppLayout
     private H1 viewTitle;
     @Autowired
     private HttpServletRequest req;
+          @Autowired
+          GoodRepository repository;
 
     public userPage() {
 
@@ -46,6 +50,16 @@ public class userPage extends AppLayout
 
         menu = createMenu();
         addToDrawer(createDrawerContent(menu));
+//        try{
+//            int pageNumber = 1; //default page number
+//            int pageSize = 1; //default page size
+//
+//            userGoodsPage goodsPage = new userGoodsPage(repository, pageNumber, pageSize);
+//            setContent(goodsPage);
+//
+//        }catch (NullPointerException ex){
+//            Notification.show("Товары отсутствуют", 10000, Notification.Position.BOTTOM_CENTER);
+//        }
     }
 
     private Component createHeaderContent() {

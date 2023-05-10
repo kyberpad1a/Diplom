@@ -18,6 +18,7 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.StreamResource;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,9 +26,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.annotation.security.RolesAllowed;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Objects;
 
 @Route(value = "/gooddetails", layout = userPage.class)
 public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long>
@@ -191,7 +194,11 @@ public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long
             }
             catch (NullPointerException ex){
 
-                return null;
+                try {
+                    return new ByteArrayInputStream(IOUtils.toByteArray(Objects.requireNonNull(getClass().getResourceAsStream("/undefinedPhoto.png"))));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
         });

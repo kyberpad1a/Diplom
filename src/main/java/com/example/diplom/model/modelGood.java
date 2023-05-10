@@ -41,6 +41,10 @@ public class modelGood {
     @OneToMany(mappedBy = "goods", fetch = FetchType.LAZY)
     private Collection<modelOrderGood> orderGoodCollection;
 
+    @OneToMany(mappedBy = "good", fetch = FetchType.LAZY)
+    private Collection<ModelRating> writtenRatings;
+
+
     public Long getIDGood() {
         return IDGood;
     }
@@ -121,7 +125,15 @@ public class modelGood {
         this.orderGoodCollection = orderGoodCollection;
     }
 
-    public modelGood(Long IDGood, String good_Name, String good_Material, double good_Price, String good_Description, boolean logicalFlag, modelFranchise franchise, modelCategory category, Collection<modelPhoto> usedPhotos, Collection<modelOrderGood> orderGoodCollection) {
+    public Collection<ModelRating> getWrittenRatings() {
+        return writtenRatings;
+    }
+
+    public void setWrittenRatings(Collection<ModelRating> writtenRatings) {
+        this.writtenRatings = writtenRatings;
+    }
+
+    public modelGood(Long IDGood, String good_Name, String good_Material, double good_Price, String good_Description, boolean logicalFlag, modelFranchise franchise, modelCategory category, Collection<modelPhoto> usedPhotos, Collection<modelOrderGood> orderGoodCollection, Collection<ModelRating> writtenRatings) {
         this.IDGood = IDGood;
         Good_Name = good_Name;
         Good_Material = good_Material;
@@ -132,5 +144,6 @@ public class modelGood {
         this.category = category;
         this.usedPhotos = usedPhotos;
         this.orderGoodCollection = orderGoodCollection;
+        this.writtenRatings = writtenRatings;
     }
 }

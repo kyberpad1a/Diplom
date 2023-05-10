@@ -188,7 +188,7 @@ public class goodsInfo extends VerticalLayout implements BeforeEnterObserver {
         layout.setAlignItems(Alignment.START);
         Button btnAdd = new Button("Добавить");
 
-        //grid.setSizeFull();
+        grid.setSizeFull();
         grid.addColumn(modelGood::getGood_Name).setHeader("Название товара").setWidth("74%");
         //grid.addColumn(modelGood::getFranchise).setHeader("Франшиза");
 
