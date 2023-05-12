@@ -1,21 +1,25 @@
 package com.example.diplom.view.user;
 
-import com.example.diplom.model.modelGood;
-import com.example.diplom.model.modelOrder;
-import com.example.diplom.model.modelOrderGood;
-import com.example.diplom.model.modelPhoto;
+import com.example.diplom.model.*;
 import com.example.diplom.repo.*;
 import com.example.diplom.view.DeniedAccessView;
+import com.example.diplom.view.auth.loginPage;
+import com.example.diplom.view.auth.registrationPage;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.splitlayout.SplitLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.StreamResource;
 import org.apache.commons.io.IOUtils;
@@ -30,6 +34,7 @@ import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 @Route(value = "/gooddetails", layout = userPage.class)
@@ -40,11 +45,20 @@ public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long
     @Autowired
     GoodRepository repository;
 
+    private Binder<ModelRating> binder = new BeanValidationBinder<>(ModelRating.class);
+
+
     @Autowired
     PhotoRepository photoRepository;
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    GoodRepository goodRepository;
+
+    @Autowired
+    RatingRepository ratingRepository;
 
     @Autowired
     OrderRepository orderRepository;
@@ -62,6 +76,17 @@ public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long
         VerticalLayout content = new VerticalLayout();
         content.setAlignSelf(Alignment.CENTER);
         content.setAlignItems(Alignment.CENTER);
+        VerticalLayout orderLayout = new VerticalLayout();
+
+        H3 name = new H3(good.getGood_Name());
+
+        //name.setWidthFull();
+        orderLayout.add(name);
+
+        Span price = new Span(String.format("%.2f ₽", good.getGood_Price()));
+        price.getStyle().set("font-size", "24px");
+        //price.getStyle().set("color", "green");
+        orderLayout.add(price);
 
         content.setWidthFull();
         Image mainImg = new Image();
@@ -87,22 +112,67 @@ public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long
         scroller.setContent(imgLayout);
         scroller.setWidthFull();
         content.add(scroller);
+        Button buyButton = new Button("Добавить в корзину", event -> {
+
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            id = userRepository.findByUsername(username).getIDUser();
+            if (id!=null) {
+                if (!orderRepository.existsByPaymentStatusIsFalseAndUser_IDUser(id)) {
+                    modelOrder modelOrder = new modelOrder();
+                    LocalDate localDate = LocalDate.now();
+                    Date date = Date.valueOf(localDate);
+                    modelOrder.setOrder_Date(date);
+                    modelOrder.setUser(userRepository.findByUsername(username));
+                    modelOrder.setPaymentStatus(false);
+                    orderRepository.save(modelOrder);
+
+                    modelOrderGood modelOrderGood = new modelOrderGood();
+                    modelOrderGood.setGoodQuantity(1);
+                    modelOrderGood.setGoods(repository.findByIDGood(aLong));
+                    modelOrderGood.setOrder(orderRepository.findByPaymentStatusIsFalseAndUser_IDUser(id));
+                    orderGoodRepository.save(modelOrderGood);
+                    // Notification.show(username);
+                    Notification.show("Товар добавлен в корзину!");
+                } else {
+
+                    if (orderGoodRepository.findByGoods_IDGoodAndOrder_User_IDUser(aLong, id) == null) {
+                        modelOrderGood modelOrderGood = new modelOrderGood();
+                        modelOrderGood.setGoodQuantity(1);
+                        modelOrderGood.setGoods(repository.findByIDGood(aLong));
+                        modelOrderGood.setOrder(orderRepository.findByPaymentStatusIsFalseAndUser_IDUser(id));
+                        orderGoodRepository.save(modelOrderGood);
+                    } else {
+                        modelOrderGood modelOrderGood = orderGoodRepository.findByGoods_IDGoodAndOrder_User_IDUser(aLong, id);
+                        modelOrderGood.setGoodQuantity(modelOrderGood.getGoodQuantity() + 1);
+                        modelOrderGood.setOrder(modelOrderGood.getOrder());
+                        modelOrderGood.setGoods(modelOrderGood.getGoods());
+                        orderGoodRepository.save(modelOrderGood);
+                    }
+                    Notification.show("Товар добавлен в корзину");
+                }
+            } else
+                UI.getCurrent().navigate(loginPage.class);
+        });
+
+        SplitLayout splitLayout = new SplitLayout(imgLayout, orderLayout);
+        splitLayout.setOrientation(SplitLayout.Orientation.HORIZONTAL);
+        splitLayout.setSplitterPosition(70);
+        splitLayout.setSizeFull();
+        content.add(splitLayout);
+
+        orderLayout.add(buyButton);
+        //orderLayout.setAlignSelf(Alignment.END);
+        orderLayout.setAlignItems(Alignment.CENTER);
+        imgLayout.setAlignSelf(Alignment.STRETCH);
+        //imgLayout.add(orderLayout);
+        //content.add(buyButton);
 
 
 
-//        SplitLayout splitLayout = new SplitLayout(mainImg, imgLayout);
-//        splitLayout.setOrientation(SplitLayout.Orientation.VERTICAL);
-//        splitLayout.setSplitterPosition(70);
-//        splitLayout.setSizeFull();
-//        content.add(splitLayout);
-        H2 name = new H2(good.getGood_Name());
-        name.setWidthFull();
-        content.add(name);
 
-//        Span price = new Span(String.format("%.2f ₽", good.getGood_Price()));
-//        price.getStyle().set("font-size", "24px");
-//        price.getStyle().set("color", "green");
-//        content.add(price);
+
+
 
 
         TextArea description = new TextArea("Описание");
@@ -129,56 +199,80 @@ public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long
         category.setReadOnly(true);
         content.add(category);
 
-        NumberField price = new NumberField("Цена");
-        price.setValue(good.getGood_Price());
-        price.setWidthFull();
-        price.setReadOnly(true);
-        content.add(price);
+//        NumberField price = new NumberField("Цена");
+//        price.setValue(good.getGood_Price());
+//        price.setWidthFull();
+//        price.setReadOnly(true);
+//        content.add(price);
 
 
-        Button buyButton = new Button("Добавить в корзину", event -> {
-
+        Button btnRating = new Button("Добавить отзыв", buttonClickEvent -> {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String username = authentication.getName();
-            id = userRepository.findByUsername(username).getIDUser();
-            if (!orderRepository.existsByPaymentStatusIsFalseAndUser_IDUser(id)) {
-                modelOrder modelOrder = new modelOrder();
-                LocalDate localDate = LocalDate.now();
-                Date date = Date.valueOf(localDate);
-                modelOrder.setOrder_Date(date);
-                modelOrder.setUser(userRepository.findByUsername(username));
-                modelOrder.setPaymentStatus(false);
-                orderRepository.save(modelOrder);
+            Long id= userRepository.findByUsername(authentication.getName()).getIDUser();
+            if (id!=null){
+                Dialog ratingPopup = new Dialog();
+                IntegerField value = new IntegerField("Оценка");
+                Button btnConfirm = new Button("Подтвердить");
+                value.setMax(5);
+                value.setMin(1);
+                value.setStep(1);
+                value.setStepButtonsVisible(true);
+                TextArea ratingText = new TextArea("Отзыв");
+                ratingText.setMaxLength(500);
+                ratingText.addValueChangeListener(e -> {
+                    e.getSource()
+                            .setHelperText(e.getValue().length() + "/" + 500);});
+                ratingText.setWidthFull();
+                ratingPopup.add(value, ratingText, btnConfirm);
+                binder.forField(ratingText).asRequired("Заполните поле 'Отзыв'").bind(ModelRating::getRatingText, ModelRating::setRatingText);
+                binder.forField(value).asRequired("Заполните поле 'Оценка'").withValidator(rate -> rate > 0 && rate<=5, "Неверный формат цены").bind(ModelRating::getRatingValue, ModelRating::setRatingValue);
 
-                modelOrderGood modelOrderGood = new modelOrderGood();
-                modelOrderGood.setGoodQuantity(1);
-                modelOrderGood.setGoods(repository.findByIDGood(aLong));
-                modelOrderGood.setOrder(orderRepository.findByPaymentStatusIsFalseAndUser_IDUser(id));
-                orderGoodRepository.save(modelOrderGood);
-               // Notification.show(username);
-                Notification.show("Товар добавлен в корзину!");
-            }
-            else{
+                binder.addStatusChangeListener(e -> btnConfirm.setEnabled(binder.isValid()));
+                btnConfirm.addClickListener(buttonClickEvent1 -> {
+                    ModelRating modelRating = new ModelRating();
+                    modelRating.setRatingText(ratingText.getValue());
+                    modelRating.setRatingValue(value.getValue());
+                    modelRating.setUser(userRepository.findByUsername(authentication.getName()));
+                    modelRating.setGood(goodRepository.findByIDGood(aLong));
+                    ratingRepository.save(modelRating);
+                    Notification.show("Успешно добавлено", 3000, Notification.Position.BOTTOM_CENTER);
+                    ratingPopup.close();
 
-                if (orderGoodRepository.findByGoods_IDGoodAndOrder_User_IDUser(aLong, id)==null){
-                    modelOrderGood modelOrderGood = new modelOrderGood();
-                    modelOrderGood.setGoodQuantity(1);
-                    modelOrderGood.setGoods(repository.findByIDGood(aLong));
-                    modelOrderGood.setOrder(orderRepository.findByPaymentStatusIsFalseAndUser_IDUser(id));
-                    orderGoodRepository.save(modelOrderGood);
-                }
-                else {
-                    modelOrderGood modelOrderGood = orderGoodRepository.findByGoods_IDGoodAndOrder_User_IDUser(aLong, id);
-                    modelOrderGood.setGoodQuantity(modelOrderGood.getGoodQuantity()+1);
-                    modelOrderGood.setOrder(modelOrderGood.getOrder());
-                    modelOrderGood.setGoods(modelOrderGood.getGoods());
-                    orderGoodRepository.save(modelOrderGood);
-                }
-                Notification.show("Товар добавлен в корзину");
+                });
+                ratingPopup.open();
+
             }
+            else
+                UI.getCurrent().navigate(loginPage.class);
         });
-        content.add(buyButton);
-        add(content);
+        add(content, btnRating);
+        Collection<ModelRating> modelRating = ratingRepository.findAllByGood_IDGood(aLong);
+        for (ModelRating rating:modelRating)
+        {
+            VerticalLayout loginAndRatingText = new VerticalLayout();
+            VerticalLayout ratingValue = new VerticalLayout();
+            ratingValue.setAlignItems(Alignment.CENTER);
+            H3 login = new H3(rating.getUser().getUsername());
+            TextArea textArea = new TextArea();
+            textArea.setValue(rating.getRatingText());
+            textArea.setReadOnly(true);
+            Span ratingVal = new Span(String.format("%d из 5", rating.getRatingValue()));
+            ratingVal.getStyle().set("font-size", "40px");
+            textArea.setWidthFull();
+            loginAndRatingText.add(login, textArea);
+            loginAndRatingText.setAlignItems(Alignment.START);
+            ratingValue.add(ratingVal);
+            HorizontalLayout layout = new HorizontalLayout();
+            layout.setWidthFull();
+            layout.add(loginAndRatingText, ratingValue);
+            layout.setAlignSelf(Alignment.STRETCH);
+            layout.setAlignItems(Alignment.STRETCH);
+
+            add(layout);
+
+        }
+
+
     }
     public Image generateImage(byte[] path) {
 

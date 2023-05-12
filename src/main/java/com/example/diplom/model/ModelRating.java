@@ -26,13 +26,6 @@ public class ModelRating {
     @ManyToOne(optional = true, cascade = CascadeType.MERGE)
     private modelUser user;
 
-    public ModelRating(Long IDRating, String ratingText, int ratingValue, modelGood good, modelUser user) {
-        this.IDRating = IDRating;
-        RatingText = ratingText;
-        RatingValue = ratingValue;
-        this.good = good;
-        this.user = user;
-    }
 
     public Long getIDRating() {
         return IDRating;
@@ -73,4 +66,12 @@ public class ModelRating {
     public void setUser(modelUser user) {
         this.user = user;
     }
+    public ModelRating(Long IDRating, String ratingText, int ratingValue, modelGood good, modelUser user) {
+        this.IDRating = IDRating;
+        RatingText = ratingText;
+        RatingValue = ratingValue;
+        this.good = good;
+        this.user = user;
+    }
+
 }

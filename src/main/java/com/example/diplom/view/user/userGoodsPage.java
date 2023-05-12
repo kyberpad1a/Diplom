@@ -106,7 +106,7 @@ public class userGoodsPage extends VerticalLayout
 
 
         // Загружаем новые элементы начиная с последней загруженной позиции
-        newGoods = repository.findAllByLogicalFlagFalse(PageRequest.of(itemCount, 3));
+        newGoods = repository.findAllByLogicalFlagFalse(PageRequest.of(itemCount, 6));
         itemCount++;
         System.out.println("Загружено " + newGoods.size() + " новых элементов");
 
