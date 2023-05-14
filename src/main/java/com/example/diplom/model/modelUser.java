@@ -151,6 +151,7 @@ public class modelUser {
         this.users = users;
     }
 
+
     public modelUser(Long IDUser, String username, String password, String surname, String name, String patronymic, String email, String resettoken, boolean active, Set<roleEnum> roles, Collection<modelOrder> orderCollection, Collection<ModelRating> users) {
         this.IDUser = IDUser;
         this.username = username;

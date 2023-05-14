@@ -76,7 +76,7 @@ public class registrationPage extends VerticalLayout {
         password.setWidth("100%");
         // password.setTooltipText("пароль должен быть такой-то");
         Tooltip tooltip = password.getTooltip().withManual(true);
-        password.setHelperText("yhhyhu");
+        //password.setHelperText("yhhyhu");
 
         PasswordField confirmPasswordField = new PasswordField("Подтвердите пароль");
         confirmPasswordField.setPlaceholder("Подтвердите пароль");

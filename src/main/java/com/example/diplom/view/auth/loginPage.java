@@ -80,9 +80,9 @@ public class loginPage extends VerticalLayout {
             UI.getCurrent().navigate(registrationPage.class);
         });
         H1 label = new H1("Авторизация");
-        //RouterLink forgotPwd = new RouterLink("Забыли пароль?", restorePage.class);
+        RouterLink forgotPwd = new RouterLink("Забыли пароль?", restorePage.class);
         HorizontalLayout btns = new HorizontalLayout(loginButton, registerButton);
-        VerticalLayout loginFormLayout = new VerticalLayout(label, usernameField, passwordField, btns
+        VerticalLayout loginFormLayout = new VerticalLayout(label, usernameField, passwordField, btns, forgotPwd
         );
         loginFormLayout.setHeightFull();
         loginFormLayout.setMargin(true);

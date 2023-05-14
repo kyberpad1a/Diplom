@@ -226,7 +226,7 @@ public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long
                 ratingPopup.add(value, ratingText, btnConfirm);
                 binder.forField(ratingText).asRequired("Заполните поле 'Отзыв'").bind(ModelRating::getRatingText, ModelRating::setRatingText);
                 binder.forField(value).asRequired("Заполните поле 'Оценка'").withValidator(rate -> rate > 0 && rate<=5, "Неверный формат цены").bind(ModelRating::getRatingValue, ModelRating::setRatingValue);
-
+                
                 binder.addStatusChangeListener(e -> btnConfirm.setEnabled(binder.isValid()));
                 btnConfirm.addClickListener(buttonClickEvent1 -> {
                     ModelRating modelRating = new ModelRating();
