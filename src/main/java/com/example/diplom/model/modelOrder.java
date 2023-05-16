@@ -23,6 +23,9 @@ public class modelOrder {
     @OneToMany(mappedBy = "order", fetch = FetchType.EAGER)
     private Collection<modelOrderGood> orderGoodCollection;
 
+    @OneToOne(optional = true, mappedBy = "order", cascade = CascadeType.ALL)
+    private ModelShipping shipping;
+
     public Long getID_Order() {
         return ID_Order;
     }
@@ -63,11 +66,20 @@ public class modelOrder {
         this.orderGoodCollection = orderGoodCollection;
     }
 
-    public modelOrder(Long ID_Order, Date order_Date, boolean paymentStatus, modelUser user, Collection<modelOrderGood> orderGoodCollection) {
+    public ModelShipping getShipping() {
+        return shipping;
+    }
+
+    public void setShipping(ModelShipping shipping) {
+        this.shipping = shipping;
+    }
+
+    public modelOrder(Long ID_Order, Date order_Date, boolean paymentStatus, modelUser user, Collection<modelOrderGood> orderGoodCollection, ModelShipping shipping) {
         this.ID_Order = ID_Order;
         Order_Date = order_Date;
         this.paymentStatus = paymentStatus;
         this.user = user;
         this.orderGoodCollection = orderGoodCollection;
+        this.shipping = shipping;
     }
 }

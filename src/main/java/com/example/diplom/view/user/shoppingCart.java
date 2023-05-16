@@ -19,6 +19,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.router.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -98,7 +99,9 @@ public class shoppingCart extends VerticalLayout implements BeforeEnterObserver 
         this.userRepository = userRepository;
         this.orderGoodRepository = orderGoodRepository;
         btnConfirm.addClickListener(buttonClickEvent -> {
-           UI.getCurrent().navigate(OrderPage.class);
+            if (grid.getDataProvider().size(new Query<>()) != 0)
+            UI.getCurrent().navigate(OrderPage.class);
+            else Notification.show("Корзина пуста", 3000, Notification.Position.BOTTOM_CENTER);
         });
     }
 

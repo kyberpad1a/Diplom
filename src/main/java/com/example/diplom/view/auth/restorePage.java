@@ -61,7 +61,7 @@ public class restorePage extends VerticalLayout {
         sendBtn.addClickListener(buttonClickEvent -> {
             email = mailField.getValue();
             if (repository.findByEmail(email)!=null) {
-                MailService mailService = new MailService(mailSender, "isip_n.s.ignatov@mpt.ru");
+                MailService mailService = new MailService(mailSender, "ignatovnikita301203@gmail.com");
                 RandomCodeGenerator codeGenerator = new RandomCodeGenerator(6);
                 code = codeGenerator.generateCode();
                 mailService.sendCodeToResetPassword(repository.findByEmail(email), code);

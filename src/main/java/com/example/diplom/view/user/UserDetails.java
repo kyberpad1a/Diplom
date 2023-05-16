@@ -4,6 +4,7 @@ import com.example.diplom.model.modelUser;
 import com.example.diplom.repo.UserRepository;
 import com.example.diplom.service.UserService;
 import com.example.diplom.service.registrationService;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -59,6 +60,9 @@ public class UserDetails extends VerticalLayout {
         Button btnUpdate = new Button("Изменить");
         Button btnConfirm = new Button("Подтвердить");
         Button btnOrders = new Button("История заказов");
+        btnOrders.addClickListener(buttonClickEvent -> {
+            UI.getCurrent().navigate(OrderHistory.class);
+        });
         surname.setEnabled(false);
         name.setEnabled(false);
         patronymic.setEnabled(false);

@@ -36,7 +36,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-
+@PageTitle("Детали товара")
 @Route(value = "/gooddetails", layout = userPage.class)
 public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long>
 //        , BeforeEnterObserver
@@ -179,6 +179,7 @@ public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long
         description.setValue(good.getGood_Description());
         description.setWidthFull();
         description.setReadOnly(true);
+        description.getStyle().set("border-color", "transparent");
         content.add(description);
 
         TextField material = new TextField("Материал");

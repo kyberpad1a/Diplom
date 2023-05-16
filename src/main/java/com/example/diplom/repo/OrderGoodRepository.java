@@ -12,6 +12,7 @@ import java.util.Optional;
 public interface OrderGoodRepository extends JpaRepository<modelOrderGood, Long> {
     modelOrderGood findByGoods_IDGoodAndOrder_User_IDUser(Long IDGood, Long IDUser);
     Collection<modelOrderGood> findAllByOrder_PaymentStatusAndOrder_User_IDUser(boolean flag, Long id);
+    Collection<modelOrderGood> findAllByOrder_ID_Order(Long id);
 
 
 }
