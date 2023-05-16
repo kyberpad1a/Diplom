@@ -180,15 +180,13 @@ public class goodsInfo extends VerticalLayout implements BeforeEnterObserver {
         addPopupLayout.setColspan(header, 2);
         addPopupLayout.setColspan(label, 2);
         VerticalLayout updPopupLayout = new VerticalLayout();
-        //updPopupLayout.add(header1, updFranchise, btnUpdFranchise);
         addPopupLayout.add(header, addGoodName, addMaterial, addPrice, cbCategory, cbFranchise, addDescription, label, multiFileUpload, btnAddGood);
         addPopup.add(addPopupLayout);
-        //updPopup.add(updPopupLayout);
         VerticalLayout layout = new VerticalLayout();
         layout.setAlignItems(Alignment.START);
         Button btnAdd = new Button("Добавить");
 
-        grid.setSizeFull();
+        //grid.setSizeFull();
         grid.addColumn(modelGood::getGood_Name).setHeader("Название товара").setWidth("74%");
         //grid.addColumn(modelGood::getFranchise).setHeader("Франшиза");
 

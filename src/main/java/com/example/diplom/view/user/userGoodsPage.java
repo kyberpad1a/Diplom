@@ -101,23 +101,10 @@ public class userGoodsPage extends VerticalLayout
     }
 
     private void loadMoreItems(GoodRepository repository, FlexLayout layout, Button btnLoad) {
-        // Получаем количество загруженных элементов
-
-
-
-        // Загружаем новые элементы начиная с последней загруженной позиции
         newGoods = repository.findAllByLogicalFlagFalse(PageRequest.of(itemCount, 6));
         itemCount++;
         System.out.println("Загружено " + newGoods.size() + " новых элементов");
 
-//        if (newGoods.isEmpty()) {
-//            btnLoad.setVisible(false);
-//            return;
-//        } else {
-//            btnLoad.setVisible(true);
-//        }
-
-        // Добавляем новые элементы в FlexLayout
         for (modelGood good : newGoods) {
             VerticalLayout goodLayout = new VerticalLayout();
             RouterLink details = new RouterLink("Подробнее", goodsDetails.class, good.getIDGood());

@@ -118,7 +118,7 @@ public class userPage extends AppLayout
                 createTab("Профиль", UserDetails.class),
                 //createTab("Франшизы", franchiseInfo.class),
                 //createTab("Card List", CardListView.class),
-                createTab("Log out", loginPage.class)};
+                createTab("Логин", loginPage.class)};
     }
 
     private static Tab createTab(String text,

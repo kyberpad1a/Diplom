@@ -80,7 +80,7 @@ public class franchiseInfo extends VerticalLayout implements BeforeEnterObserver
         Button btnAdd = new Button("Добавить");
 
         //grid.setSizeFull();
-        grid.addColumn(modelFranchise::getFranchise_Name).setHeader("Франшиза").setWidth("85%");
+        grid.addColumn(modelFranchise::getFranchise_Name).setHeader("Франшиза").setWidth("85%").setSortable(true);
         grid.addComponentColumn(item -> {
             Button btnEdit = new Button(new Icon(VaadinIcon.EDIT));
             Button btnDelete =new Button(new Icon(VaadinIcon.CLOSE));

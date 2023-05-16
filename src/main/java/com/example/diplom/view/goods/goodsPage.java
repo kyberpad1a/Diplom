@@ -93,7 +93,7 @@ public class goodsPage extends AppLayout implements BeforeEnterObserver {
                 createTab("Категории", categoryInfo.class),
                 createTab("Франшизы", franchiseInfo.class),
                 //createTab("Card List", CardListView.class),
-                createTab("Log out", loginPage.class) };
+                createTab("Логин", loginPage.class) };
     }
 
     private static Tab createTab(String text,

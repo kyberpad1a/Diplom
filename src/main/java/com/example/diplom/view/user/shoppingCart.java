@@ -97,6 +97,9 @@ public class shoppingCart extends VerticalLayout implements BeforeEnterObserver 
 
         this.userRepository = userRepository;
         this.orderGoodRepository = orderGoodRepository;
+        btnConfirm.addClickListener(buttonClickEvent -> {
+           UI.getCurrent().navigate(OrderPage.class);
+        });
     }
 
     private void gridRefresh(OrderGoodRepository repository, UserRepository userRepository)

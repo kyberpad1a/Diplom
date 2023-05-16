@@ -44,6 +44,7 @@ public class categoryInfo extends VerticalLayout implements BeforeEnterObserver 
  private boolean pressFlag;
     Grid<modelCategory> grid = new Grid<>(modelCategory.class, false);
 
+
     private void submitRequest() {
         service.addCategory(binder.getBean());
     }
@@ -82,7 +83,7 @@ public class categoryInfo extends VerticalLayout implements BeforeEnterObserver 
         Button btnAdd = new Button("Добавить");
 
         //grid.setSizeFull();
-        grid.addColumn(modelCategory::getCategory_Name).setHeader("Категория").setWidth("85%");
+        grid.addColumn(modelCategory::getCategory_Name).setHeader("Категория").setWidth("85%").setSortable(true);
         grid.addComponentColumn(item -> {
             Button btnEdit = new Button(new Icon(VaadinIcon.EDIT));
             Button btnDelete =new Button(new Icon(VaadinIcon.CLOSE));
