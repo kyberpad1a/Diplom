@@ -19,49 +19,52 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 import javax.sql.DataSource;
 
+/**
+ * Конфигурация Spring Security для приложения.
+ */
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private DataSource dataSource;
-    private static final String LOGIN_PROCESSING_URL = "/login";
-    private static final String LOGIN_FAILURE_URL = "/login?error";
 
     private static final String LOGIN_URL = "/login";
     private static final String LOGOUT_SUCCESS_URL = "/login";
 
+    /**
+     * Настройка доступа к страницам в зависимости от ролей пользователей.
+     * @param http Экземпляр класса HttpSecurity
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        // Vaadin handles CSRF internally
+
         http.csrf().disable()
                 .exceptionHandling().accessDeniedPage("/accessDenied")
                 .and()
                 .authorizeRequests()
-
-
-
                 .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
                 .antMatchers("/gooddetails", "/userGoodsPage", "/user").permitAll()
-
-
-                // Allow all requests by logged-in users.
                 .anyRequest().authenticated()
-
-                // Configure the login page.
                 .and().formLogin().loginPage(LOGIN_URL).permitAll()
                 .and().anonymous().key("myAnonymousKey")
-                // Configure logout
                 .and().logout().logoutSuccessUrl(LOGOUT_SUCCESS_URL)
-                ;
+        ;
     }
 
+    /**
+     * Создание PasswordEncoder для шифрования паролей.
+     * @return PasswordEncoder
+     */
     @Bean
     public PasswordEncoder getPasswordEncoder(){
         return new BCryptPasswordEncoder(8);
     }
 
-
+    /**
+     * Настройка AuthenticationManagerBuilder для работы с базой данных.
+     * @param auth Экземлпяр класса AuthenticationManagerBuilder
+     */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.jdbcAuthentication().dataSource(dataSource).passwordEncoder(getPasswordEncoder())
@@ -69,6 +72,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authoritiesByUsernameQuery("select u.username, ur.roles from model_user u inner join user_role ur on u.iduser = ur.user_id where u.username=?");
     }
 
+    /**
+     * Создание AuthenticationManager.
+     * @return AuthenticationManager
+     */
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -76,33 +83,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     /**
-     * Allows access to static resources, bypassing Spring Security.
+     * Настройка игнорирования определенных URL.
+     * @param web Экземпляр класса WebSecurity
      */
     @Override
     public void configure(WebSecurity web) {
         web.ignoring().antMatchers(
-                // Client-side JS
                 "/VAADIN/**",
-
-                // the standard favicon URI
                 "/favicon.ico",
-
-                // the robots exclusion standard
                 "/robots.txt",
-
-                // web application manifest
                 "/manifest.webmanifest",
                 "/sw.js",
                 "/offline.html",
-
-                // icons and images
                 "/icons/**",
                 "/images/**",
                 "/styles/**",
-
-                // (development mode) H2 debugging console
                 "/h2-console/**",
                 "/login",
-        "/registration");
+                "/registration");
     }
 }

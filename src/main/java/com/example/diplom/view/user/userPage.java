@@ -27,20 +27,39 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
-
+/**
+ * Класс отображения страницы пользователя,
+ * наследуется от Vaadin AppLayout и содержит методы для создания верхнего меню, боковой панели и т. д.
+ * */
 @Route(value = "/user")
 
-public class userPage extends AppLayout
-//        implements BeforeEnterObserver
-      {
+public class userPage extends AppLayout{
+        /**
+         * Меню с закладками для переключения между страницами
+         */
+        private final Tabs menu;
 
-    private final Tabs menu;
-    private H1 viewTitle;
-    @Autowired
-    private HttpServletRequest req;
-          @Autowired
-          GoodRepository repository;
+        /**
+         * Заголовок текущей открытой страницы
+         */
+        private H1 viewTitle;
 
+        /**
+         * Автоматически связывает экземпляр, когда он создается,
+         * используя конструктор по умолчанию, с запросом пользователя, который привел к созданию этого экземпляра.
+         */
+        @Autowired
+        private HttpServletRequest req;
+
+        /**
+         * Репозиторий товара, автоматически внедряемый при помощи Spring's Dependency Injection
+         */
+        @Autowired
+        GoodRepository repository;
+
+        /**
+         * Конструктор класса, который вызывает методы создания верхнего меню и боковой панели
+         */
     public userPage() {
 
 
@@ -50,18 +69,11 @@ public class userPage extends AppLayout
 
         menu = createMenu();
         addToDrawer(createDrawerContent(menu));
-//        try{
-//            int pageNumber = 1; //default page number
-//            int pageSize = 1; //default page size
-//
-//            userGoodsPage goodsPage = new userGoodsPage(repository, pageNumber, pageSize);
-//            setContent(goodsPage);
-//
-//        }catch (NullPointerException ex){
-//            Notification.show("Товары отсутствуют", 10000, Notification.Position.BOTTOM_CENTER);
-//        }
     }
-
+    /**
+     * Создает содержимое верхней панели, включая кнопку переключения боковой панели
+     * @return компонент горизонтального макета
+     */
     private Component createHeaderContent() {
         HorizontalLayout layout = new HorizontalLayout();
 
@@ -77,7 +89,11 @@ public class userPage extends AppLayout
 
         return layout;
     }
-
+    /**
+     * Создает содержимое боковой панели с заданным меню
+     * @param menu экземпляр Tabs, содержащий закладки меню
+     * @return компонент вертикального макета
+     */
     private Component createDrawerContent(Tabs menu) {
         VerticalLayout layout = new VerticalLayout();
 
@@ -102,7 +118,11 @@ public class userPage extends AppLayout
         layout.add(logoLayout, menu);
         return layout;
     }
-
+    /**
+     * Метод создает вертикальное меню (Tabs) для навигации по страницам приложения.
+     *
+     * @return Tabs вертикальное меню (Tabs)
+     */
     private Tabs createMenu() {
         final Tabs tabs = new Tabs();
         tabs.setOrientation(Tabs.Orientation.VERTICAL);
@@ -111,16 +131,24 @@ public class userPage extends AppLayout
         tabs.add(createMenuItems());
         return tabs;
     }
-
+    /**
+     * Метод создает массив элементов (Component), которые будут использоваться в меню.
+     *
+     * @return Component[] массив элементов (Tab) для меню.
+     */
     private Component[] createMenuItems() {
         return new Tab[]{createTab("Товары", userGoodsPage.class),
                 createTab("Корзина", shoppingCart.class),
                 createTab("Профиль", UserDetails.class),
-                //createTab("Франшизы", franchiseInfo.class),
-                //createTab("Card List", CardListView.class),
                 createTab("Логин", loginPage.class)};
     }
-
+    /**
+     * Метод создает пункт меню (Tab) с указанным текстом и адресом навигации.
+     *
+     * @param text текст, отображаемый на пункте меню (Tab)
+     * @param navigationTarget адрес навигации, куда будет направляться пользователь при выборе пункта меню (Tab)
+     * @return Tab пункт меню (Tab) с указанным текстом и адресом навигации.
+     */
     private static Tab createTab(String text,
                                  Class<? extends Component> navigationTarget) {
         final Tab tab = new Tab();
@@ -128,11 +156,17 @@ public class userPage extends AppLayout
         ComponentUtil.setData(tab, Class.class, navigationTarget);
         return tab;
     }
-
+    /**
+     * Метод возвращает заголовок текущей страницы.
+     *
+     * @return String заголовок текущей страницы.
+     */
     private String getCurrentPageTitle() {
         return getContent().getClass().getAnnotation(PageTitle.class).value();
     }
-
+    /**
+     * Метод вызывается после навигации пользователя по приложению. Проверяет, какая страница открыта, и устанавливает ее пункт меню (Tab) в качестве выбранного.
+     */
     @Override
     protected void afterNavigation() {
         super.afterNavigation();
@@ -141,7 +175,12 @@ public class userPage extends AppLayout
         getTabForComponent(getContent()).ifPresent(menu::setSelectedTab);
 
     }
-
+    /**
+     * Метод возвращает пункт меню (Tab), связанный с данной страницей компонента.
+     *
+     * @param component компонент страницы, для которой нужно найти соответствующий пункт меню (Tab)
+     * @return Optional<Tab> пункт меню (Tab), связанный с данной страницей компонента.
+     */
     private Optional<Tab> getTabForComponent(Component component) {
         return menu.getChildren()
                 .filter(tab -> ComponentUtil.getData(tab, Class.class)
@@ -149,14 +188,5 @@ public class userPage extends AppLayout
                 .findFirst().map(Tab.class::cast);
     }
 
-//    @Override
-//    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//
-//        if (beforeEnterEvent.getNavigationTarget() != DeniedAccessView.class &&
-//                authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).noneMatch(role -> role.equals("USER"))) {
-//            beforeEnterEvent.rerouteTo(DeniedAccessView.class);
-//        }
-//    }
 }
 

@@ -44,6 +44,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * Класс, отвечающий за управление пользователями
+ */
+
 @PageTitle("Управление пользователями")
 @Route(value = "/manageUsers", layout = managementPage.class)
 public class manageUsers extends VerticalLayout implements BeforeEnterObserver {
@@ -55,16 +59,32 @@ public class manageUsers extends VerticalLayout implements BeforeEnterObserver {
     private transient UserService service;
     VerticalLayout layout = new VerticalLayout();
     private Binder<modelUser> binder = new BeanValidationBinder<>(modelUser.class);
+    /**
+     * Метод, инициализирующий Binder
+     */
     private void init() {
         binder.setBean(new modelUser());
     }
+    /**
+     * Метод для обновления данных пользователя в БД
+     */
     private void updateRequest(){
         service.updateUser(binder.getBean(), id, flag);
     }
+    /**
+     * Метод для обновления статуса активности пользователя в БД
+     */
     private void updateRequestActive(){
         service.updateUserActive(binder.getBean(), id, boolflag);
     }
     Grid<modelUser> grid = new Grid<>(modelUser.class, false);
+
+    /**
+     * Конструктор класса
+     *
+     * @param repository - Репозиторий пользователей
+     * @param service - Сервис пользователей
+     */
     @Autowired
     public manageUsers(UserRepository repository, UserService service) {
         this.repository = repository;
@@ -99,7 +119,6 @@ public class manageUsers extends VerticalLayout implements BeforeEnterObserver {
         }).setHeader("Роль").setWidth("25%");
         grid.addComponentColumn(item ->{
             Checkbox cbActive = new Checkbox();
-            //binder.forField(cbActive).bind(modelUser::isActive, modelUser::setActive);
             cbActive.setValue(item.isActive());
 
             cbActive.addValueChangeListener(e -> {
@@ -120,23 +139,17 @@ public class manageUsers extends VerticalLayout implements BeforeEnterObserver {
             });
             return cbActive;
         }).setHeader("Активен?");
-        //grid.setItemDetailsRenderer(createGoodDetailsRenderer());
-
-
-
-
-
-
-
         init();
 
         gridRefresh(repository);
-        //grid.setDataProvider(dataProvider);
         layout.add(grid);
         add(layout);
 
     }
-
+    /**
+     * Обновляет таблицу пользователей на основе репозитория.
+     * @param repository Репозиторий пользователей.
+     */
     private void gridRefresh(UserRepository repository)
     {
         try{
@@ -152,7 +165,10 @@ public class manageUsers extends VerticalLayout implements BeforeEnterObserver {
         }
 
     }
-
+    /**
+     * Обрабатывает событие перед входом в представление.
+     * @param beforeEnterEvent Событие перед входом в представление.
+     */
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

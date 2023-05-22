@@ -9,6 +9,19 @@ import java.util.Optional;
 
 @Repository
 public interface PhotoRepository extends JpaRepository<modelPhoto, Long> {
+
+    /**
+     * Найти первое фото товара по его ID
+     * @param ID ID товара
+     * @return modelPhoto, первое фото товара
+     */
     public modelPhoto findFirstByGood_IDGood(Long ID);
+
+    /**
+     * Найти все фото товара по его ID
+     * @param ID ID товара
+     * @return Collection<modelPhoto>, коллекция фотографий товара
+     */
     public Collection<modelPhoto> findAllByGood_IDGood(Long ID);
 }
+

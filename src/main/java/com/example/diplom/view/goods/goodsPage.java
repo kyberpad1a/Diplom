@@ -22,12 +22,27 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
+/**
+ * Класс страницы товаров, унаследованный от AppLayout и реализующий интерфейс BeforeEnterObserver.
+ * Обеспечивает доступ к странице только пользователям с ролью GOODSSTAFF.
+ */
 @Route(value = "/goods")
 @RouteAlias(value = "/")
 public class goodsPage extends AppLayout implements BeforeEnterObserver {
+
+    /**
+     * Табы меню навигации по странице товаров.
+     */
     private final Tabs menu;
+    /**
+     * Заголовок страницы.
+     */
     private H1 viewTitle;
-    public goodsPage(){
+
+    /**
+     * Создает новый объект класса и настраивает вид страницы.
+     */
+    public goodsPage() {
         setPrimarySection(AppLayout.Section.DRAWER);
 
         addToNavbar(true, createHeaderContent());
@@ -35,6 +50,11 @@ public class goodsPage extends AppLayout implements BeforeEnterObserver {
         menu = createMenu();
         addToDrawer(createDrawerContent(menu));
     }
+
+    /**
+     * Создает содержимое шапки страницы.
+     * @return компонент горизонтальной компоновки.
+     */
     private Component createHeaderContent() {
         HorizontalLayout layout = new HorizontalLayout();
 
@@ -46,25 +66,25 @@ public class goodsPage extends AppLayout implements BeforeEnterObserver {
 
         layout.add(new DrawerToggle());
 
-
         viewTitle = new H1();
         layout.add(viewTitle);
-
-
 
         return layout;
     }
 
+    /**
+     * Создает содержимое боковой панели с табами меню.
+     * @param menu - компонент табов меню.
+     * @return компонент вертикальной компоновки.
+     */
     private Component createDrawerContent(Tabs menu) {
         VerticalLayout layout = new VerticalLayout();
-
 
         layout.setSizeFull();
         layout.setPadding(false);
         layout.setSpacing(false);
         layout.getThemeList().set("spacing-s", true);
         layout.setAlignItems(FlexComponent.Alignment.STRETCH);
-
 
         HorizontalLayout logoLayout = new HorizontalLayout();
         logoLayout.setId("logo");
@@ -75,10 +95,14 @@ public class goodsPage extends AppLayout implements BeforeEnterObserver {
         logoLayout.add(IMG);
         logoLayout.add(new H2("Логово лича"));
 
-
         layout.add(logoLayout, menu);
         return layout;
     }
+
+    /**
+     * Создает табы меню.
+     * @return компонент табов меню.
+     */
     private Tabs createMenu() {
         final Tabs tabs = new Tabs();
         tabs.setOrientation(Tabs.Orientation.VERTICAL);
@@ -88,14 +112,23 @@ public class goodsPage extends AppLayout implements BeforeEnterObserver {
         return tabs;
     }
 
+    /**
+     * Создает элементы табов меню.
+     * @return массив компонентов табов меню.
+     */
     private Component[] createMenuItems() {
         return new Tab[] { createTab("Товары", goodsInfo.class),
                 createTab("Категории", categoryInfo.class),
                 createTab("Франшизы", franchiseInfo.class),
-                //createTab("Card List", CardListView.class),
                 createTab("Логин", loginPage.class) };
     }
 
+    /**
+     * Создает таб с навигационной ссылкой на страницу.
+     * @param text - текст названия страницы.
+     * @param navigationTarget - класс страницы.
+     * @return экземпляр класса Tab.
+     */
     private static Tab createTab(String text,
                                  Class<? extends Component> navigationTarget) {
         final Tab tab = new Tab();
@@ -103,18 +136,32 @@ public class goodsPage extends AppLayout implements BeforeEnterObserver {
         ComponentUtil.setData(tab, Class.class, navigationTarget);
         return tab;
     }
+
+    /**
+     * Получает текущий заголовок страницы.
+     * @return строку с заголовком страницы.
+     */
     private String getCurrentPageTitle() {
         return getContent().getClass().getAnnotation(PageTitle.class).value();
     }
+
+    /**
+     * Вызывается после навигации на новую страницу и обновляет заголовок и выбранный таб меню.
+     */
     @Override
     protected void afterNavigation() {
         super.afterNavigation();
-
 
         getTabForComponent(getContent()).ifPresent(menu::setSelectedTab);
 
         viewTitle.setText(getCurrentPageTitle());
     }
+    /**
+     * Получение вкладки для компонента
+     *
+     * @param component компонент для которого нужно получить соответствующую вкладку
+     * @return объект Optional, содержащий соответствующую вкладку, или пустой Optional, если такой вкладки не существует
+     */
     private Optional<Tab> getTabForComponent(Component component) {
         return menu.getChildren()
                 .filter(tab -> ComponentUtil.getData(tab, Class.class)
@@ -122,6 +169,11 @@ public class goodsPage extends AppLayout implements BeforeEnterObserver {
                 .findFirst().map(Tab.class::cast);
     }
 
+    /**
+     * Выполняется перед входом на страницу приложения
+     *
+     * @param beforeEnterEvent событие, вызванное перед входом на страницу
+     */
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

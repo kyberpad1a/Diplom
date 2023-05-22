@@ -10,15 +10,30 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Класс, предоставляющий методы для работы с моделью товара.
+ */
 @Service
 public class goodService {
+
+    /**
+     * Экземпляр репозитория для доступа к данным о товарах.
+     */
     @Autowired
     private GoodRepository repository;
 
+    /**
+     * Экземпляр репозитория для доступа к данным о фотографиях.
+     */
     @Autowired
     private PhotoRepository photoRepository;
-    public void addGood(modelGood good, List<byte[]> bytes){
 
+    /**
+     * Метод добавления нового товара в БД с фотографиями товара.
+     * @param good Объект модели товара, который нужно добавить.
+     * @param bytes Список массивов байт, содержащих изображения товара.
+     */
+    public void addGood(modelGood good, List<byte[]> bytes){
         repository.save(good);
         for (byte[] byt:bytes) {
             modelPhoto modelPhoto = new modelPhoto();
@@ -26,16 +41,16 @@ public class goodService {
             modelPhoto.setGood(good);
             photoRepository.save(modelPhoto);
         }
-
-
-
-
-
     }
+
+    /**
+     * Метод обновления информации о товаре по его id.
+     * @param good Объект модели товара, содержащий новые данные для обновления.
+     * @param id Идентификатор товара, который нужно обновить.
+     */
     public void updateGood(modelGood good, Long id){
         modelGood originalmodel = repository.findById(id).orElse(null);
         if(good != null){
-
             originalmodel.setGood_Name(good.getGood_Name());
             originalmodel.setGood_Material(good.getGood_Material());
             originalmodel.setGood_Price(good.getGood_Price());
@@ -47,10 +62,14 @@ public class goodService {
         }
     }
 
+    /**
+     * Метод помечает товар в БД как удаленный логически.
+     * @param good Объект модели товара, который нужно пометить как удаленный.
+     * @param id Идентификатор товара, который нужно пометить как удаленный.
+     */
     public void logicalDelete(modelGood good, Long id){
         modelGood originalmodel = repository.findById(id).orElse(null);
         if(good != null) {
-
             originalmodel.setGood_Name(good.getGood_Name());
             originalmodel.setGood_Material(good.getGood_Material());
             originalmodel.setGood_Price(good.getGood_Price());

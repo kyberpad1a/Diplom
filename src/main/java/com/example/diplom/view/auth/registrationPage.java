@@ -19,19 +19,42 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Route;
 import org.springframework.dao.DataIntegrityViolationException;
 
+/**
+ * Класс представляет страницу регистрации пользователей.
+ * Реализует интерфейс VerticalLayout для размещения элементов по вертикали.
+ */
 @Route("/registration")
 public class registrationPage extends VerticalLayout {
+
+    /**
+     * Сервис для обработки запросов регистрации пользователей.
+     */
     private transient registrationService service;
+
+    /**
+     * Объект Binder, связывающий поля объекта modelUser с компонентами ввода значений на странице.
+     */
     private Binder<modelUser> binder = new BeanValidationBinder<>(modelUser.class);
 
+    /**
+     * Метод для отправки данных пользователя на регистрацию через сервис.
+     */
     private void submitRequest() {
         service.register(binder.getBean());
     }
 
+    /**
+     * Метод инициализации объекта Binder, связывающего поля объекта modelUser с компонентами на странице.
+     */
     private void init() {
         binder.setBean(new modelUser());
     }
 
+    /**
+     * Конструктор класса registrationPage.
+     *
+     * @param service   - сервис для обработки запросов регистрации пользователей.
+     */
     public registrationPage(registrationService service) {
         this.service = service;
         H1 heading = new H1("Регистрация");

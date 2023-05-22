@@ -24,26 +24,73 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
 
+/**
+ * Страница профиля пользователя.
+ */
 @PageTitle("Профиль")
 @Route(value = "/userdetails", layout = userPage.class)
-public class UserDetails extends VerticalLayout {
+public class UserDetails extends VerticalLayout  {
 
+    /**
+     * Сервис для работы с пользователем.
+     */
     private transient UserService service;
+
+    /**
+     * Идентификатор пользователя.
+     */
     Long id;
+
+    /**
+     * Биндер для связывания полей объекта пользователя и поля ввода на странице.
+     */
     private Binder<modelUser> binder = new BeanValidationBinder<>(modelUser.class);
+
+    /**
+     * Поле ввода фамилии.
+     */
     TextField surname = new TextField("Фамилия");
+
+    /**
+     * Поле ввода имени.
+     */
     TextField name = new TextField("Имя");
+
+    /**
+     * Поле ввода отчества.
+     */
     TextField patronymic = new TextField("Отчество");
+
+    /**
+     * Поле ввода адреса электронной почты.
+     */
     EmailField email = new EmailField("Адрес эл. почты");
+
+    /**
+     * Метод для отправки информации об изменении профиля.
+     */
     private void submitRequest() {
         service.updateUserData(binder.getBean(), id);
     }
 
+    /**
+     * Инициализация биндера.
+     */
     private void init() {
         binder.setBean(new modelUser());
     }
+
+    /**
+     * Репозиторий для работы с данными пользователя.
+     */
     @Autowired
     UserRepository userRepository;
+
+    /**
+     * Конструктор класса.
+     * @param userRepository репозиторий для работы с данными пользователя
+     * @param service сервис для работы с пользователем
+     */
     public UserDetails(UserRepository userRepository, UserService service){
         this.userRepository=userRepository;
         this.service=service;
@@ -120,6 +167,9 @@ public class UserDetails extends VerticalLayout {
         });
 
     }
+    /**
+     * Метод обновляет значения полей класса данными пользователя из базы данных.
+     */
     public void refresh(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();

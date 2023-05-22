@@ -31,28 +31,59 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+/**
+ * Страница для просмотра и редактирования списка франшиз.
+ * Реализует интерфейс BeforeEnterObserver для обработки доступа к странице с помощью Spring Security.
+ */
 @PageTitle("Франшизы")
-
 @Route(value = "/franchiseInfo", layout = goodsPage.class)
 public class franchiseInfo extends VerticalLayout implements BeforeEnterObserver {
+
+    /**
+     * Объект сервиса для работы с франшизами
+     */
     private transient franchiseService service;
+
+    /**
+     * Идентификатор выбранной франшизы
+     */
     Long id;
+
+    /**
+     * Байндер для связывания полей формы и модели франшизы
+     */
     private Binder<modelFranchise> binder = new BeanValidationBinder<>(modelFranchise.class);
-
+    /**
+     * Таблица для отображения списка франшиз
+     */
     Grid<modelFranchise> grid = new Grid<>(modelFranchise.class, false);
-
+    /**
+     * Флаг, указывающий, была ли нажата кнопка "Добавить"
+     */
     private void submitRequest() {
         service.addFranchise(binder.getBean());
     }
+    /**
+     * Метод для добавления новой франшизы
+     */
     private boolean pressFlag;
-
+    /**
+     * Метод для обновления данных выбранной франшизы
+     */
     private void updateRequest(){
         service.updateFranchise(binder.getBean(), id);
     }
-
+    /**
+     * Метод для инициализации байндера
+     */
     private void init() {
         binder.setBean(new modelFranchise());
     }
+    /**
+     * Создание экземпляра класса
+     * @param repository   репозиторий франшиз
+     * @param service      сервис для работы с франшизами
+     */
     @Autowired
     public franchiseInfo(FranchiseRepository repository, franchiseService service){
         this.service = service;
@@ -61,25 +92,22 @@ public class franchiseInfo extends VerticalLayout implements BeforeEnterObserver
         Label header1 = new Label("Изменение данных");
         Label header = new Label("Добавление данных");
         TextField addFranchise = new TextField("Наименование франшизы");
-       // TextField updFranchise = new TextField("Наименование франшизы");
+
         addFranchise.setSizeFull();
         Button btnAddFranchise = new Button("Добавить");
         Button btnUpdFranchise = new Button("Изменить");
         btnAddFranchise.setSizeFull();
         VerticalLayout addPopupLayout = new VerticalLayout();
         VerticalLayout updPopupLayout = new VerticalLayout();
-        //updPopupLayout.add(header1, updFranchise, btnUpdFranchise);
+
         addPopupLayout.add(header, addFranchise, btnAddFranchise);
         addPopup.add(addPopupLayout);
         updPopup.add(updPopupLayout);
-        //ListDataProvider<modelCategory> dataProvider = new ListDataProvider<>(repository.findAll());
-
-        //Iterable<modelCategory> list = repository.findAll();
         VerticalLayout layout = new VerticalLayout();
         layout.setAlignItems(Alignment.START);
         Button btnAdd = new Button("Добавить");
 
-        //grid.setSizeFull();
+
         grid.addColumn(modelFranchise::getFranchise_Name).setHeader("Франшиза").setWidth("85%").setSortable(true);
         grid.addComponentColumn(item -> {
             Button btnEdit = new Button(new Icon(VaadinIcon.EDIT));
@@ -91,10 +119,10 @@ public class franchiseInfo extends VerticalLayout implements BeforeEnterObserver
             btnEdit.addClickListener(buttonClickEvent -> {
                 id=item.getID_Franchise();
                 header.setText("Изменение данных");
-                //addPopupLayout.add(header1);
+
                 addPopupLayout.add(btnUpdFranchise);
                 addPopupLayout.remove(btnAddFranchise);
-                //addPopupLayout.remove(header1);
+
 
                 pressFlag = true;
                 addPopup.open();
@@ -106,11 +134,11 @@ public class franchiseInfo extends VerticalLayout implements BeforeEnterObserver
         }).setTextAlign(ColumnTextAlign.END).setFrozenToEnd(true).setHeader(btnAdd);
         btnAdd.addClickListener(buttonClickEvent -> {
             if (pressFlag==true){
-                //addPopupLayout.add(header);
+
                 header.setText("Добавление данных");
                 addPopupLayout.add(btnAddFranchise);
                 addPopupLayout.remove(btnUpdFranchise);
-                //addPopupLayout.remove(header1);
+
 
             }
             pressFlag = false;
@@ -119,9 +147,9 @@ public class franchiseInfo extends VerticalLayout implements BeforeEnterObserver
             addPopup.open();
         });
         binder.forField(addFranchise).asRequired("Заполните поле 'Наименование франшизы'").bind(modelFranchise::getFranchise_Name, modelFranchise::setFranchise_Name);
-       // binder.forField(updFranchise).asRequired("Заполните поле 'Наименование франшизы'").bind(modelFranchise::getFranchise_Name, modelFranchise::setFranchise_Name);
+
         binder.addStatusChangeListener(e -> btnAddFranchise.setEnabled(binder.isValid()));
-        //binder.addStatusChangeListener(e -> btnUpdFranchise.setEnabled(binder.isValid()));
+
         btnAddFranchise.addClickListener(buttonClickEvent -> {
             try {
                 submitRequest();
@@ -148,12 +176,15 @@ public class franchiseInfo extends VerticalLayout implements BeforeEnterObserver
         });
         init();
         grid.setItems(repository.findAll());
-        //grid.setDataProvider(dataProvider);
+
         layout.add(grid);
         add(layout);
 
     }
-
+    /**
+     * Метод вызывается перед входом в определенное представление.
+     * @param beforeEnterEvent объект типа BeforeEnterEvent, содержащий информацию о намерении перейти к другому представлению
+     */
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

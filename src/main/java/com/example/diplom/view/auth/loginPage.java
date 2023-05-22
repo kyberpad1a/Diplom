@@ -25,93 +25,103 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+/**
+ * Страница авторизации пользователя.
+ * Реализует UI с полями для ввода имени пользователя и пароля, кнопками для входа и регистрации, ссылкой для восстановления пароля.
+ * При успешной авторизации перенаправляет на страницу в зависимости от роли пользователя (userGoodsPage, goodsInfo, manageUsers).
+ */
 @Route("/login")
-//@CssImport(value = "")
-//@Theme("login-rich-content.css")
 public class loginPage extends VerticalLayout {
+
+    /**
+     * Менеджер аутентификации- позволяет аутентифицировать пользователей.
+     */
     private final AuthenticationManager authenticationManager;
+
+    /**
+     * Репозиторий пользователей.
+     */
     @Autowired
-    final
-    UserRepository userRepository;
-//    @Autowired
-//    private PasswordEncoder passwordEncoder;
+    final UserRepository userRepository;
+
+    /**
+     * Конструктор класса.
+     *
+     * @param authenticationManager Менеджер аутентификации.
+     * @param userRepository Репозиторий пользователей.
+     */
     public loginPage(AuthenticationManager authenticationManager, UserRepository userRepository){
         this.authenticationManager = authenticationManager;
         this.userRepository=userRepository;
-       addClassName("login-rich-content");
-        //loginForm.getElement().getThemeList().add("dark");
+        addClassName("login-rich-content");
+
+
         TextField usernameField = new TextField("Логин");
         PasswordField passwordField = new PasswordField("Пароль");
+
+
         Button loginButton = new Button("Войти");
+        Button registerButton = new Button("Регистрация");
+
+
         loginButton.addClickListener(buttonClickEvent->{
             try{
-            String username = usernameField.getValue();
-            String password = passwordField.getValue();
-            final Authentication authentication = authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(username, password));
-                if(authentication != null ) {
+                String username = usernameField.getValue();
+                String password = passwordField.getValue();
 
+
+                final Authentication authentication = authenticationManager
+                        .authenticate(new UsernamePasswordAuthenticationToken(username, password));
+
+                if(authentication != null ) {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
 
 
-                    //Access to view by role
                     if (authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(role -> role.equals("USER")) && userRepository.existsByActiveIsTrueAndUsername(username)) {
                         UI.getCurrent().navigate(userGoodsPage.class);
-                    } else
-                        if (authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(role -> role.equals("GOODSSTAFF")) && userRepository.existsByActiveIsTrueAndUsername(username)){
-                            UI.getCurrent().navigate(goodsInfo.class);
+                    } else if (authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(role -> role.equals("GOODSSTAFF")) && userRepository.existsByActiveIsTrueAndUsername(username)){
+                        UI.getCurrent().navigate(goodsInfo.class);
+                    } else if (authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(role -> role.equals("ADMIN")) && userRepository.existsByActiveIsTrueAndUsername(username)) {
+                        UI.getCurrent().navigate(manageUsers.class);
                     }
-                        else
-                        if (authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(role -> role.equals("ADMIN")) && userRepository.existsByActiveIsTrueAndUsername(username)) {
-                            UI.getCurrent().navigate(manageUsers.class);
-                        }
-                }}
-            catch (AuthenticationException ex) {
-               // Notification.show(ex.toString());
+                }
+            } catch (AuthenticationException ex) {
                 Notification.show("Неверное имя пользователя или пароль");
             }
-
-
         });
 
-        Button registerButton = new Button("Регистрация");
-        //registerButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+
         registerButton.addClickListener(buttonClickEvent -> {
             UI.getCurrent().navigate(registrationPage.class);
         });
+
+
         H1 label = new H1("Авторизация");
         RouterLink forgotPwd = new RouterLink("Забыли пароль?", restorePage.class);
-        HorizontalLayout btns = new HorizontalLayout(loginButton, registerButton);
-        VerticalLayout loginFormLayout = new VerticalLayout(label, usernameField, passwordField, btns, forgotPwd
-        );
+
+
+        VerticalLayout loginFormLayout = new VerticalLayout(label, usernameField, passwordField, new HorizontalLayout(loginButton, registerButton), forgotPwd);
         loginFormLayout.setHeightFull();
         loginFormLayout.setMargin(true);
-
         loginFormLayout.setAlignItems(Alignment.CENTER);
-        HorizontalLayout loginPageLayout = new HorizontalLayout(
-                loginFormLayout
-        );
+
+
+        HorizontalLayout loginPageLayout = new HorizontalLayout(loginFormLayout);
         loginPageLayout.setSizeFull();
         add(loginPageLayout);
+
+
         Image backgroundImage = new Image("./images/Screenshot_2.png", "Login Background");
         backgroundImage.setWidth("100%");
         backgroundImage.setHeight("650px");
-
-
-
-        VerticalLayout imageLayout = new VerticalLayout(
-                backgroundImage
-        );
+        VerticalLayout imageLayout = new VerticalLayout(backgroundImage);
         imageLayout.setSizeFull();
         imageLayout.setAlignItems(Alignment.CENTER);
-
-
         loginPageLayout.add(imageLayout);
         loginPageLayout.setFlexGrow(1, imageLayout);
-
     }
+}
 
-    }
 
 
 

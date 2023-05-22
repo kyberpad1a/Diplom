@@ -49,53 +49,121 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+/**
+ * Страница для просмотра, добавления, изменения, удаления информации о товарах.
+ */
 @PageTitle("Информация о товарах")
 @Route(value = "/goodsInfo", layout = goodsPage.class)
 public class goodsInfo extends VerticalLayout implements BeforeEnterObserver {
+
+    /**
+     * Сервис для работы с данными товаров.
+     */
     private transient goodService service;
+
+    /**
+     * Абсолютный путь к файлу фото.
+     */
     private String absolutePath;
+
+    /**
+     * Максимальное количество символов в описании товара.
+     */
     private int charLimit = 1000;
+
+    /**
+     * Идентификатор фото.
+     */
     private Long photoID;
+
+    /**
+     * Идентификатор товара.
+     */
     Long id;
 
+    /**
+     * Идентификаторы товаров.
+     */
     Iterable<Long> ID;
+
+    /**
+     * Биндер для связывания модели товара с элементами пользовательского интерфейса.
+     */
     private Binder<modelGood> binder = new BeanValidationBinder<>(modelGood.class);
+
+    /**
+     * Список байтов фото товара.
+     */
     private List<byte[]> bytes;
+
+    /**
+     * Грид для отображения списка товаров.
+     */
     Grid<modelGood> grid = new Grid<>(modelGood.class, false);
+
+    /**
+     * Модель товара для удаления.
+     */
     modelGood modelGoodDelete;
 
-
-
+    /**
+     * Метод для отправки запроса на добавление товара.
+     * @param bytes Список байтов фото товара.
+     */
     private void submitRequest(List<byte[]> bytes) {
         service.addGood(binder.getBean(), bytes);
     }
+
+    /**
+     * Флаг для проверки нажатия кнопки добавления или изменения товара.
+     */
     private boolean pressFlag;
+
+    /**
+     * Вертикальный лэйаут страницы.
+     */
     private VerticalLayout layout;
 
+    /**
+     * Метод для отправки запроса на обновление товара.
+     */
     private void updateRequest(){
         service.updateGood(binder.getBean(), id);
     }
 
+    /**
+     * Метод для отправки запроса на удаление товара.
+     * @param good Модель товара.
+     */
     private void deleteRequest(modelGood good){service.logicalDelete(good, id);}
 
+    /**
+     * Метод инициализации биндера.
+     */
     private void init() {
         binder.setBean(new modelGood());
     }
+    /**
+     * Конструктор класса.
+     * @param repository Репозиторий товаров.
+     * @param service Сервис для работы с данными товаров.
+     * @param franchiseRepository Репозиторий франшиз.
+     * @param categoryRepository Репозиторий категорий товаров.
+     * @param photoRepository Репозиторий фото товаров.
+     * @param bytes Список байтов фото товара.
+     */
     @Autowired
     public goodsInfo(GoodRepository repository, goodService service, @Autowired FranchiseRepository franchiseRepository, @Autowired CategoryRepository categoryRepository, PhotoRepository photoRepository, List<byte[]> bytes){
         this.service = service;
         this.bytes=bytes;
 
         MultiFileMemoryBuffer multiFileBuffer = new MultiFileMemoryBuffer();
-        //MemoryBuffer memoryBuffer = new MemoryBuffer();
+
 
 
 
@@ -122,9 +190,9 @@ public class goodsInfo extends VerticalLayout implements BeforeEnterObserver {
 
 
         });
-        //multiFileUpload.setMaxFileSize(200);
+
         multiFileUpload.setSizeFull();
-       // multiFileUpload.setAcceptedFileTypes(".jpeg", ".png");
+
 
         Dialog addPopup = new Dialog();
         Dialog updPopup = new Dialog();
@@ -134,17 +202,7 @@ public class goodsInfo extends VerticalLayout implements BeforeEnterObserver {
         TextField addGoodName = new TextField("Наименование товара");
         TextField addMaterial = new TextField("Материал");
         NumberField addPrice = new NumberField("Цена");
-//        addPrice.addValueChangeListener(event -> {
-//            String value = event.getValue().toString();
-//            if (value.length()>1){
-//            if (value.startsWith("0")) {
-//                Notification.show("Первая цифра не должна быть нулем",
-//                        3000, Notification.Position.BOTTOM_CENTER);
-//                // установить предыдущее корректное значение
-//                event.getSource().setValue(event.getOldValue());
-//            }}
-//        });
-//        addPrice.setValue(null);
+
         Div prefix = new Div();
         prefix.setText("₽");
         addPrice.setPrefixComponent(prefix);
@@ -162,8 +220,7 @@ public class goodsInfo extends VerticalLayout implements BeforeEnterObserver {
         addDescription.addValueChangeListener(e -> {
             e.getSource()
                     .setHelperText(e.getValue().length() + "/" + charLimit);});
-       // TextField updFranchise = new TextField("Наименование франшизы");
-        //addFranchise.setSizeFull();
+
         Button btnAddGood = new Button("Добавить");
         Button btnUpdGood = new Button("Изменить");
         btnAddGood.setSizeFull();
@@ -186,17 +243,15 @@ public class goodsInfo extends VerticalLayout implements BeforeEnterObserver {
         layout.setAlignItems(Alignment.START);
         Button btnAdd = new Button("Добавить");
 
-        //grid.setSizeFull();
-        grid.addColumn(modelGood::getGood_Name).setHeader("Название товара").setWidth("74%");
-        //grid.addColumn(modelGood::getFranchise).setHeader("Франшиза");
 
-        //modelCategory categoryRow = categoryRepository.findAllByAffectedGoods(repository.findAll());
+        grid.addColumn(modelGood::getGood_Name).setHeader("Название товара").setWidth("74%");
+
         grid.addColumn(item -> item.getCategory().getCategory_Name()).setHeader("Категория");
         grid.setItemDetailsRenderer(createGoodDetailsRenderer());
         grid.addComponentColumn(item -> {
             Button btnEdit = new Button(new Icon(VaadinIcon.EDIT));
             Button btnDelete =new Button(new Icon(VaadinIcon.CLOSE));
-           // btnDelete.setVisible(false);
+
             btnDelete.addClickListener(buttonClickEvent -> {
                 id = item.getIDGood();
 
@@ -204,17 +259,17 @@ public class goodsInfo extends VerticalLayout implements BeforeEnterObserver {
                 init();
 
 
-                //grid.setItems(repository.findAllByLogicalFlagFalse());
+
                 gridRefresh(repository);
 
             });
             btnEdit.addClickListener(buttonClickEvent -> {
                 id=item.getIDGood();
                 header.setText("Изменение данных");
-                //addPopupLayout.add(header1);
+
                 addPopupLayout.add(btnUpdGood);
                 addPopupLayout.remove(btnAddGood);
-                //addPopupLayout.remove(header1);
+
                 addPopupLayout.remove(multiFileUpload);
                 addPopupLayout.remove(label);
 
@@ -228,14 +283,14 @@ public class goodsInfo extends VerticalLayout implements BeforeEnterObserver {
         }).setTextAlign(ColumnTextAlign.END).setFrozenToEnd(true).setHeader(btnAdd);
         btnAdd.addClickListener(buttonClickEvent -> {
             if (pressFlag==true){
-                //addPopupLayout.add(header);
+
                 header.setText("Добавление данных");
                 addPopupLayout.add(btnAddGood);
                 addPopupLayout.remove(btnUpdGood);
                 addPopupLayout.add(label);
                 addPopupLayout.add(multiFileUpload);
 
-                //addPopupLayout.remove(header1);
+
 
             }
             pressFlag = false;
@@ -281,12 +336,15 @@ public class goodsInfo extends VerticalLayout implements BeforeEnterObserver {
         init();
 
         gridRefresh(repository);
-        //grid.setDataProvider(dataProvider);
+
         layout.add(grid);
         add(layout);
 
     }
-
+    /**
+     * Обновляет таблицу товаров на основе репозитория.
+     * @param repository Репозиторий товаров.
+     */
     private void gridRefresh(GoodRepository repository)
     {
         try{
@@ -302,13 +360,19 @@ public class goodsInfo extends VerticalLayout implements BeforeEnterObserver {
         }
 
     }
-
+    /**
+     * Создает компонент-рендерер для отображения подробной информации о товаре.
+     * @return Возвращает компонент-рендерер для отображения подробной информации о товаре.
+     */
     private static ComponentRenderer<GoodDetailsFormLayout, modelGood> createGoodDetailsRenderer() {
         return new ComponentRenderer<>(
                 GoodDetailsFormLayout::new,
                 GoodDetailsFormLayout::setGood);
     }
-
+    /**
+     * Обрабатывает событие перед входом в представление.
+     * @param beforeEnterEvent Событие перед входом в представление.
+     */
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -319,19 +383,50 @@ public class goodsInfo extends VerticalLayout implements BeforeEnterObserver {
         }
     }
 
-
+    /**
+     * Класс формы для детальной информации о товаре.
+     */
     private static class GoodDetailsFormLayout extends FormLayout {
+        /**
+         * Поле ввода наименования товара.
+         */
         TextField addGoodName = new TextField("Наименование товара");
+
+        /**
+         * Поле ввода материала товара.
+         */
         TextField addMaterial = new TextField("Материал");
+
+        /**
+         * Поле ввода цены товара.
+         */
         TextField addPrice = new TextField("Цена");
+
+        /**
+         * Поле ввода франшизы товара.
+         */
         TextField cbFranchise = new TextField("Франшиза");
+
+        /**
+         * Поле ввода категории товара.
+         */
         TextField cbCategory = new TextField("Категория");
+
+        /**
+         * Поле ввода описания товара.
+         */
         TextArea addDescription = new TextArea("Описание");
 
 
+        /**
+         * Блок, содержащий префикс цены.
+         */
         Div prefix = new Div();
 
-
+        /**
+         * Конструктор формы для детальной информации о товаре.
+         * Включает поля ввода для наименования, материала, цены, категории, франшизы и описания товара.
+         */
         public GoodDetailsFormLayout() {
             prefix.setText("₽");
             addPrice.setPrefixComponent(prefix);
@@ -342,17 +437,19 @@ public class goodsInfo extends VerticalLayout implements BeforeEnterObserver {
             });
 
         }
-
+        /**
+         * Устанавливает подробную информацию о товаре.
+         * @param good Товар.
+         */
         public void setGood(modelGood good) {
             addGoodName.setValue(good.getGood_Name());
             addDescription.setValue(good.getGood_Description());
             addMaterial.setValue(good.getGood_Material());
             addPrice.setValue(String.valueOf(good.getGood_Price()));
             cbCategory.setValue(String.valueOf(good.getCategory().getCategory_Name()));
-           // cbCategory.setItemLabelGenerator(modelCategory::getCategory_Name);
+
             cbFranchise.setValue(String.valueOf(good.getFranchise().getFranchise_Name()));
-            //path.setValue(modelPhoto.getPhoto_Path());
-           // cbFranchise.setItemLabelGenerator(modelFranchise::getFranchise_Name);
+
         }
 }}
 

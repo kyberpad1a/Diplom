@@ -28,22 +28,61 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+/**
+ * Страница оформления заказа.
+ * Включает в себя поля для заполнения адреса доставки, номера квартиры,
+ * кнопку для получения информации по адресу, кнопку для подтверждения заказа.
+ */
 @PageTitle("Оформить заказ")
 @Route(value = "/order", layout = userPage.class)
 public class OrderPage extends VerticalLayout {
+
+    /**
+     * Репозиторий пользователей.
+     */
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * Биндер для модели доставки.
+     */
     private Binder<ModelShipping> binder = new BeanValidationBinder<>(ModelShipping.class);
 
+    /**
+     * Репозиторий доставок.
+     */
     @Autowired
     private ShippingRepository shippingRepository;
 
+    /**
+     * Репозиторий заказов.
+     */
     @Autowired
     private OrderRepository orderRepository;
+
+    /**
+     * Флаг нажатия кнопки "Получить".
+     */
     boolean pressFlag = false;
+
+    /**
+     * ID пользователя.
+     */
     Long id;
+
+    /**
+     * Сервис для асинхронных REST-запросов.
+     */
     AsyncRestClientService clientService = new AsyncRestClientService();
+
+    /**
+     * Конструктор класса.
+     * Инициализирует все необходимые поля и элементы интерфейса страницы.
+     *
+     * @param userRepository   Репозиторий пользователей.
+     * @param orderRepository  Репозиторий заказов.
+     * @param shippingRepository Репозиторий доставок.
+     */
     public OrderPage(UserRepository userRepository, OrderRepository orderRepository, ShippingRepository shippingRepository){
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
@@ -64,7 +103,7 @@ public class OrderPage extends VerticalLayout {
         Button btnRecieve = new Button("Получить");
         btnRecieve.addClickListener(buttonClickEvent -> {
             String value = addressText.getValue();
-            //clientService.getAllComments();
+
             try {
                 addressText.setValue(clientService.getAllCommentsAsync(value));
                 pressFlag = true;
@@ -98,10 +137,10 @@ public class OrderPage extends VerticalLayout {
             modelShipping.setShippingApartment(apNumber.getValue());
             modelShipping.setShippingStatus(false);
             modelShipping.setShippingTaken(false);
+            modelShipping.setUser(null);
             shippingRepository.save(modelShipping);
             modelOrder modelOrder = orderRepository.findByPaymentStatusIsFalseAndUser_IDUser(id);
             modelOrder.setPaymentStatus(true);
-            //modelOrder.setShipping(modelShipping);
             modelOrder.setOrder_Date(modelOrder.getOrder_Date());
             modelOrder.setUser(modelOrder.getUser());
             orderRepository.save(modelOrder);

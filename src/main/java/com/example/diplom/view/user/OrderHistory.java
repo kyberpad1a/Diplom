@@ -22,16 +22,47 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.Collection;
 import java.util.stream.Stream;
 
+/**
+ * Класс для отображения истории заказов пользователей.
+ * Является потомком класса VerticalLayout.
+ */
 @PageTitle("История заказов")
 @Route(value = "/ordershistory", layout = userPage.class)
 public class OrderHistory extends VerticalLayout {
+
+    /**
+     * Репозиторий для доступа к заказам.
+     */
     @Autowired
     OrderRepository orderRepository;
+
+    /**
+     * Репозиторий для доступа к пользователям.
+     */
     @Autowired
     UserRepository userRepository;
+
+    /**
+     * Идентификатор выбранного заказа.
+     */
     Long idOrder;
+
+    /**
+     * Идентификатор пользователя.
+     */
     Long id;
+
+    /**
+     * Таблица для отображения заказов.
+     */
     Grid<modelOrder> grid = new Grid<>(modelOrder.class, false);
+
+    /**
+     * Создает экземпляр класса.
+     *
+     * @param orderRepository репозиторий для доступа к заказам
+     * @param userRepository репозиторий для доступа к пользователям
+     */
     public OrderHistory(OrderRepository orderRepository, UserRepository userRepository){
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
@@ -45,40 +76,8 @@ public class OrderHistory extends VerticalLayout {
         grid.addColumn(modelOrder::getID_Order).setHeader("Код заказа").setWidth("50%").setSortable(true);
         grid.addColumn(modelOrder::getOrder_Date).setHeader("Дата заказа").setWidth("50%").setSortable(true);
         grid.setItems(orderRepository.findAllByPaymentStatusIsTrueAndUser_IDUser(id));
-        //grid.setItemDetailsRenderer(createGoodDetailsRenderer());
 
 
     }
 
-//    public static ComponentRenderer<GoodDetailsFormLayout, modelOrder> createGoodDetailsRenderer() {
-//        return new ComponentRenderer<>(
-//                GoodDetailsFormLayout::new,
-//                GoodDetailsFormLayout::setGood);
-//    }
-//    public static class GoodDetailsFormLayout extends FormLayout {
-//        TextArea addGoodName = new TextArea();
-//        IntegerField addQuantity = new IntegerField();
-//
-//
-//
-//
-//        public GoodDetailsFormLayout() {
-//
-//
-//            Stream.of(addGoodName, addQuantity).forEach(field -> {
-//                field.setReadOnly(true);
-//                add(field);
-//
-//            });
-//
-//        }
-//
-//        public void setGood(OrderGoodRepository repository) {
-//            Collection<modelOrderGood> collection = repository.findAllByOrder_ID_Order();
-//            for (modelOrderGood good1:collection)
-//            {addGoodName.setValue(good1.getGoods().getGood_Name());
-//            addQuantity.setValue(good1.getGoodQuantity());
-//            }
-//        }
-//    }
 }

@@ -9,12 +9,20 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import javax.servlet.http.HttpServletRequest;
 import java.util.stream.Stream;
 
+/**
+ * Утилитный класс для работы с безопасностью
+ */
 public final class SecurityUtils {
 
     private SecurityUtils() {
-        // Util methods only
     }
 
+    /**
+     * Проверяет, является ли запрос внутренним запросом фреймворка
+     *
+     * @param request запрос, полученный сервлетом
+     * @return true, если запрос внутренний, иначе false
+     */
     static boolean isFrameworkInternalRequest(HttpServletRequest request) {
         final String parameterValue = request.getParameter(ApplicationConstants.REQUEST_TYPE_PARAMETER);
         return parameterValue != null
@@ -22,6 +30,11 @@ public final class SecurityUtils {
                 .anyMatch(r -> r.getIdentifier().equals(parameterValue));
     }
 
+    /**
+     * Проверяет, залогинен ли пользователь
+     *
+     * @return true, если пользователь залогинен, иначе false
+     */
     static boolean isUserLoggedIn() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication != null

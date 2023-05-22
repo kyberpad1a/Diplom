@@ -36,38 +36,71 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+/**
+ * Класс отображает страницу деталей товара с возможностью покупки и добавления отзывов.
+ * Реализован интерфейс HasUrlParameter<Long>, для получения параметра id из URL.
+ */
 @PageTitle("Детали товара")
 @Route(value = "/gooddetails", layout = userPage.class)
-public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long>
-//        , BeforeEnterObserver
-{
+public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long>{
 
+    /**
+     * Репозиторий модели товара Good
+     */
     @Autowired
     GoodRepository repository;
 
-    private Binder<ModelRating> binder = new BeanValidationBinder<>(ModelRating.class);
-
-
+    /**
+     * Репозиторий модели фото Photo
+     */
     @Autowired
     PhotoRepository photoRepository;
 
+    /**
+     * Репозиторий модели пользователя User
+     */
     @Autowired
     UserRepository userRepository;
 
+    /**
+     * Репозиторий модели товара Good для корзины
+     */
     @Autowired
     GoodRepository goodRepository;
 
+    /**
+     * Репозиторий модели рейтинга Rating
+     */
     @Autowired
     RatingRepository ratingRepository;
 
+    /**
+     * Репозиторий модели заказа Order
+     */
     @Autowired
     OrderRepository orderRepository;
 
+    /**
+     * Репозиторий модели заказа товара OrderGood
+     */
     @Autowired
     OrderGoodRepository orderGoodRepository;
 
+    /**
+     * Экземпляр привязчика модели рейтинга ModelRating к полям интерфейса.
+     */
+    private Binder<ModelRating> binder = new BeanValidationBinder<>(ModelRating.class);
+
+    /**
+     * Переменная для хранения id товара.
+     */
     private Long id;
 
+    /**
+     * Метод для получения id товара из URL.
+     * @param beforeEvent событие перед переходом по URL-адресу.
+     * @param aLong идентификатор товара.
+     */
     @Override
     public void setParameter(BeforeEvent beforeEvent, Long aLong) {
 
@@ -80,12 +113,10 @@ public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long
 
         H3 name = new H3(good.getGood_Name());
 
-        //name.setWidthFull();
         orderLayout.add(name);
 
         Span price = new Span(String.format("%.2f ₽", good.getGood_Price()));
         price.getStyle().set("font-size", "24px");
-        //price.getStyle().set("color", "green");
         orderLayout.add(price);
 
         content.setWidthFull();
@@ -103,11 +134,6 @@ public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long
             img.setWidth("200px");
             imgLayout.add(img);
             img = null;
-
-//            Image finalImg = img;
-//            img.addClickListener(imageClickEvent -> {
-//                mainImg.add(finalImg);
-//            });
         }
         scroller.setContent(imgLayout);
         scroller.setWidthFull();
@@ -132,7 +158,6 @@ public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long
                     modelOrderGood.setGoods(repository.findByIDGood(aLong));
                     modelOrderGood.setOrder(orderRepository.findByPaymentStatusIsFalseAndUser_IDUser(id));
                     orderGoodRepository.save(modelOrderGood);
-                    // Notification.show(username);
                     Notification.show("Товар добавлен в корзину!");
                 } else {
 
@@ -162,11 +187,8 @@ public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long
         content.add(splitLayout);
 
         orderLayout.add(buyButton);
-        //orderLayout.setAlignSelf(Alignment.END);
         orderLayout.setAlignItems(Alignment.CENTER);
         imgLayout.setAlignSelf(Alignment.STRETCH);
-        //imgLayout.add(orderLayout);
-        //content.add(buyButton);
 
 
 
@@ -200,11 +222,6 @@ public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long
         category.setReadOnly(true);
         content.add(category);
 
-//        NumberField price = new NumberField("Цена");
-//        price.setValue(good.getGood_Price());
-//        price.setWidthFull();
-//        price.setReadOnly(true);
-//        content.add(price);
 
 
         Button btnRating = new Button("Добавить отзыв", buttonClickEvent -> {
@@ -275,6 +292,12 @@ public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long
 
 
     }
+    /**
+     * Генерирует изображение на основе массива байтов
+     *
+     * @param path массив байтов, представляющий изображение
+     * @return объект Image для отображения изображения в пользовательском интерфейсе
+     */
     public Image generateImage(byte[] path) {
 
 
@@ -304,14 +327,5 @@ public class goodsDetails extends VerticalLayout implements HasUrlParameter<Long
         return image;
     }
 
-//    @Override
-//    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//
-//        if (beforeEnterEvent.getNavigationTarget() != DeniedAccessView.class &&
-//                authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).noneMatch(role -> role.equals("USER"))) {
-//            beforeEnterEvent.rerouteTo(DeniedAccessView.class);
-//        }
-//    }
     }
 

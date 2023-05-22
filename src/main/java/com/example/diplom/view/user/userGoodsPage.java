@@ -21,20 +21,55 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Objects;
 
+/**
+ * Страница для просмотра и покупки товаров.
+ */
 @PageTitle("Купите нашу продукцию")
 @Route(value = "/userGoodsPage", layout = userPage.class)
+public class userGoodsPage extends VerticalLayout {
 
-public class userGoodsPage extends VerticalLayout
-//        implements BeforeEnterObserver
-{
+    /**
+     * Коллекция товаров.
+     */
     Collection<modelGood> goods;
+
+    /**
+     * Изображение товара.
+     */
     Image image = new Image();
+
+    /**
+     * Количество загруженных товаров.
+     */
     private int loadedCount = 0;
+
+    /**
+     * Новые товары.
+     */
     Collection<modelGood> newGoods;
-    int itemCount=0;
+
+    /**
+     * Количество товаров.
+     */
+    int itemCount = 0;
+
+    /**
+     * Репозиторий фотографий товаров.
+     */
     @Autowired
     PhotoRepository repository;
+
+    /**
+     * ID товара.
+     */
     Long id;
+
+    /**
+     * Создает новую страницу для просмотра и покупки товаров.
+     *
+     * @param repository репозиторий товаров.
+     * @param goods коллекция товаров.
+     */
     public userGoodsPage(GoodRepository repository, Collection<modelGood> goods){
 
         this.goods=goods;
@@ -44,8 +79,6 @@ public class userGoodsPage extends VerticalLayout
 
         btnLoad.setWidthFull();
         btnLoad.getElement().getStyle().set("font-size", "50px");
-//        layout.getElement().getStyle().set("overflow-y", "scroll");
-//        layout.getElement().getStyle().set("overflow", "hidden");
 
         layout.setSizeFull();
         layout.setFlexWrap(FlexLayout.FlexWrap.WRAP);
@@ -60,46 +93,23 @@ public class userGoodsPage extends VerticalLayout
 
 
         layout.getElement().addEventListener("scroll", e -> {
-            // Получаем текущую позицию прокрутки и размер контента
             double scrollTop = layout.getElement().getProperty("scrollTop", 0d);
             double scrollHeight = layout.getElement().getProperty("scrollHeight", 0d);
             double clientHeight = layout.getElement().getProperty("clientHeight", 0d);
-
-            // Если пользователь достиг конца страницы, загружаем новые элементы
             if (scrollTop + clientHeight >= scrollHeight - 1) {
                 Notification.show("Больше нет товаров для загрузки", 3000, Notification.Position.BOTTOM_CENTER);
                 loadMoreItems(repository, layout, btnLoad);
             }
         });
 
-//        for (modelGood good : goods) {
-//
-//            VerticalLayout goodLayout = new VerticalLayout();
-//            RouterLink details = new RouterLink("Подробнее", goodsDetails.class, good.getIDGood());
-//            goodLayout.setWidth("200px");
-//            goodLayout.setSizeUndefined();
-//            id = good.getIDGood();
-//            H3 nameLabel = new H3(good.getGood_Name());
-//            image = generateImage(id);
-//
-//
-//            Label priceLabel = new Label("Цена: " + String.valueOf(good.getGood_Price()));
-//            image.setWidth("350px");
-//            image.setHeight("400px");
-//            //descriptionArea.setReadOnly(true);
-//
-//
-//            goodLayout.add(image, nameLabel, priceLabel, details);
-//            goodLayout.setFlexGrow(1.0, nameLabel, priceLabel, details);
-//            goodLayout.setAlignSelf(FlexLayout.Alignment.CENTER, nameLabel);
-//            layout.add(goodLayout);
-//        }
-//        layout.setJustifyContentMode(JustifyContentMode.AROUND);
-//        layout.setAlignItems(FlexLayout.Alignment.CENTER);
-//        add(layout, btnLoad);
-
     }
-
+    /**
+     * Загружает больше товаров.
+     *
+     * @param repository репозиторий товаров.
+     * @param layout макет страницы.
+     * @param btnLoad кнопка "Загрузить еще".
+     */
     private void loadMoreItems(GoodRepository repository, FlexLayout layout, Button btnLoad) {
         newGoods = repository.findAllByLogicalFlagFalse(PageRequest.of(itemCount, 6));
         itemCount++;
@@ -126,11 +136,15 @@ public class userGoodsPage extends VerticalLayout
         layout.setAlignItems(FlexLayout.Alignment.CENTER);
         add(layout, btnLoad);
 
-        // Добавляем новые элементы в список загруженных элементов
         goods.addAll(newGoods);
     }
 
-
+    /**
+     * Генерирует изображение товара.
+     *
+     * @param GoodID ID товара.
+     * @return изображение товара.
+     */
     public Image generateImage(Long GoodID) {
 
 
@@ -154,7 +168,11 @@ public class userGoodsPage extends VerticalLayout
 
         return image;
     }
-
+    /**
+     * Обновляет таблицу товаров.
+     *
+     * @param repository репозиторий товаров.
+     */
     private void gridRefresh(GoodRepository repository)
     {
         try{
@@ -168,16 +186,5 @@ public class userGoodsPage extends VerticalLayout
 
     }
 
-//    @Override
-//    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-//
-//
-//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//
-//            if (beforeEnterEvent.getNavigationTarget() != DeniedAccessView.class &&
-//                    authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).noneMatch(role -> role.equals("USER"))) {
-//                beforeEnterEvent.rerouteTo(DeniedAccessView.class);
-//            }
-//
-//    }
+
 }

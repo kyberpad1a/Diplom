@@ -26,16 +26,49 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * Страница восстановления пароля пользователя.
+ * URL: /restorePage
+ */
 @Route("/restorePage")
 public class restorePage extends VerticalLayout {
+    /**
+     * Binder для связи полей формы с полями модели.
+     */
     private Binder<modelUser> binder = new BeanValidationBinder<>(modelUser.class);
+
+    /**
+     * Репозиторий для доступа к данным пользователя.
+     */
     @Autowired
     UserRepository repository;
+
+    /**
+     * JavaMailSender для отправки писем.
+     */
     JavaMailSender mailSender;
+
+    /**
+     * Энкодер для кодирования пароля.
+     */
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    /**
+     * Сгенерированный код восстановления пароля.
+     */
     String code;
+
+    /**
+     * Адрес электронной почты, на который отправляется письмо.
+     */
     String email;
+
+    /**
+     * Создает страницу восстановления пароля пользователя.
+     * @param repository репозиторий для доступа к данным пользователя.
+     * @param mailSender JavaMailSender для отправки писем.
+     */
     public restorePage(UserRepository repository, JavaMailSender mailSender) {
         this.repository = repository;
         this.mailSender=mailSender;

@@ -33,21 +33,49 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-@PageTitle("Корзина")
-@Route(value = "/cart", layout = userPage.class)
-
+/**
+ * Класс для отображения корзины покупок пользователя.
+ * Реализует интерфейс BeforeEnterObserver для проверки прав доступа к странице.
+ * Наследуется от VerticalLayout для вертикального размещения элементов на странице.
+ */
 public class shoppingCart extends VerticalLayout implements BeforeEnterObserver {
+
+    /**
+     * Таблица для отображения товаров в корзине.
+     */
     Grid<modelOrderGood> grid = new Grid<>(modelOrderGood.class, false);
+
+    /**
+     * Репозиторий пользователей.
+     */
     @Autowired
-    final
-    UserRepository userRepository;
-    final
-    OrderGoodRepository orderGoodRepository;
+    final UserRepository userRepository;
+
+    /**
+     * Репозиторий заказа товаров.
+     */
+    final OrderGoodRepository orderGoodRepository;
+
+    /**
+     * Идентификатор пользователя.
+     */
     Long id;
+
+    /**
+     * Объект, представляющий HTTP-запрос.
+     */
     @Autowired
     private HttpServletRequest req;
 
-
+    /**
+     * Конструктор класса.
+     * Принимает репозитории пользователей и заказа товаров.
+     * Создает на странице таблицу для отображения товаров в корзине.
+     * Создает элементы управления (кнопки и поля) для каждой записи в таблице.
+     * При изменении количества товаров или удалении товара из корзины сохраняет изменение/удаляет запись в БД.
+     * Проверяет наличие товаров в корзине и при их отсутствии выводит соответствующее сообщение.
+     * При нажатии на кнопку "Оформить заказ" перенаправляет пользователя на страницу создания заказа.
+     */
     public shoppingCart(UserRepository userRepository, OrderGoodRepository orderGoodRepository){
 
         Label total = new Label();
@@ -61,7 +89,6 @@ public class shoppingCart extends VerticalLayout implements BeforeEnterObserver 
 
         grid.addColumn(item -> item.getGoods().getGood_Name()).setHeader("Товар").setWidth("55%").setFooter(total);
         grid.addColumn(item -> item.getGoods().getGood_Price()).setHeader("Цена");
-//        grid.addColumn(modelOrderGood::getGoodQuantity).setHeader("Количество");
         Button btnConfirm=new Button("Оформить заказ");
         grid.addComponentColumn(item->{
 
@@ -126,7 +153,10 @@ public class shoppingCart extends VerticalLayout implements BeforeEnterObserver 
         }
 
     }
-
+    /**
+     * Обрабатывает событие перед входом в представление.
+     * @param beforeEnterEvent Событие перед входом в представление.
+     */
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
 

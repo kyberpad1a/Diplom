@@ -9,18 +9,22 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import java.util.Properties;
 
 @Configuration
-public class EmailConfig
-{
+public class EmailConfig {
+
+    /**
+     * Создает экземпляр JavaMailSenderImpl для отправки электронных писем через SMTP-сервер Gmail.
+     *
+     * @return JavaMailSender - экземпляр объекта, который может использоваться для отправки писем.
+     */
     @Bean
-    public JavaMailSender getJavaMailSender()
-    {
+    public JavaMailSender getJavaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+
+
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
-
         mailSender.setUsername("ignatovnikita301203@gmail.com");
         mailSender.setPassword("rgtrtkyueuzaaecj");
-
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");

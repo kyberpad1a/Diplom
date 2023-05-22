@@ -34,55 +34,76 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Collection;
 import java.util.List;
-
+/**
+ * Класс для отображения категорий товаров
+ */
 @PageTitle("Категории")
 @Route(value = "/categoryInfo", layout = goodsPage.class)
 public class categoryInfo extends VerticalLayout implements BeforeEnterObserver {
+    /**
+     * Сервис для работы с категориями товаров
+     */
     private transient categoryService service;
+    /**
+     * Идентификатор категории
+     */
     Long id;
+    /**
+     * Объект для связывания данных модели категории с интерфейсом пользователя
+     */
     private Binder<modelCategory> binder = new BeanValidationBinder<>(modelCategory.class);
- private boolean pressFlag;
+    /**
+     * Флаг, указывающий на то, была ли нажата кнопка "Изменить"
+     */
+    private boolean pressFlag;
+    /**
+     * Таблица для отображения списка категорий товаров
+     */
     Grid<modelCategory> grid = new Grid<>(modelCategory.class, false);
 
-
+    /**
+     * Метод для добавления новой категории товара
+     */
     private void submitRequest() {
         service.addCategory(binder.getBean());
     }
-
+    /**
+     * Метод для обновления информации о категории товара
+     */
     private void updateRequest(){
         service.updateCategory(binder.getBean(), id);
     }
-
+    /**
+     * Метод для инициализации формы добавления/изменения категории товара
+     */
     private void init() {
         binder.setBean(new modelCategory());
     }
+    /**
+     * Конструктор класса
+     *
+     * @param repository Репозиторий для работы с категориями товаров
+     * @param service    Сервис для работы с категориями товаров
+     */
     @Autowired
     public categoryInfo(CategoryRepository repository, categoryService service){
         this.service = service;
         Dialog addPopup = new Dialog();
         Dialog updPopup = new Dialog();
-       // Label header1 = new Label("Изменение данных");
         Label header = new Label("Добавление данных");
         TextField addCategory = new TextField("Наименование категории");
-        //TextField updCategory = new TextField("Наименование категории");
         addCategory.setSizeFull();
         Button btnAddCategory = new Button("Добавить");
         Button btnUpdCategory = new Button("Изменить");
         btnAddCategory.setSizeFull();
         VerticalLayout addPopupLayout = new VerticalLayout();
         VerticalLayout updPopupLayout = new VerticalLayout();
-      //  updPopupLayout.add(header1, updCategory, btnUpdCategory);
         addPopupLayout.add(header, addCategory, btnAddCategory);
         addPopup.add(addPopupLayout);
         updPopup.add(updPopupLayout);
-        //ListDataProvider<modelCategory> dataProvider = new ListDataProvider<>(repository.findAll());
-
-        //Iterable<modelCategory> list = repository.findAll();
         VerticalLayout layout = new VerticalLayout();
         layout.setAlignItems(Alignment.START);
         Button btnAdd = new Button("Добавить");
-
-        //grid.setSizeFull();
         grid.addColumn(modelCategory::getCategory_Name).setHeader("Категория").setWidth("85%").setSortable(true);
         grid.addComponentColumn(item -> {
             Button btnEdit = new Button(new Icon(VaadinIcon.EDIT));
@@ -95,10 +116,8 @@ public class categoryInfo extends VerticalLayout implements BeforeEnterObserver 
             btnEdit.addClickListener(buttonClickEvent -> {
                 id=item.getID_Category();
                 header.setText("Изменение данных");
-                //addPopupLayout.add(header1);
                 addPopupLayout.add(btnUpdCategory);
                 addPopupLayout.remove(btnAddCategory);
-                //addPopupLayout.remove(header1);
 
                 pressFlag = true;
                 addPopup.open();
@@ -110,11 +129,9 @@ public class categoryInfo extends VerticalLayout implements BeforeEnterObserver 
         }).setTextAlign(ColumnTextAlign.END).setFrozenToEnd(true).setHeader(btnAdd);
         btnAdd.addClickListener(buttonClickEvent -> {
             if (pressFlag==true){
-                //addPopupLayout.add(header);
                 header.setText("Добавление данных");
                 addPopupLayout.add(btnAddCategory);
                  addPopupLayout.remove(btnUpdCategory);
-                 //addPopupLayout.remove(header1);
 
             }
             pressFlag = false;
@@ -123,10 +140,8 @@ public class categoryInfo extends VerticalLayout implements BeforeEnterObserver 
             addPopup.open();
         });
         binder.forField(addCategory).asRequired("Заполните поле 'Наименование категории'").bind(modelCategory::getCategory_Name, modelCategory::setCategory_Name);
-        //binder.forField(updCategory).asRequired("Заполните поле 'Наименование категории'").bind(modelCategory::getCategory_Name, modelCategory::setCategory_Name);
         binder.addStatusChangeListener(e -> btnAddCategory.setEnabled(binder.isValid()));
         binder.addStatusChangeListener(e -> btnUpdCategory.setEnabled(binder.isValid()));
-        //addCategory.addValidationStatusChangeListener(e -> btnAddCategory.setEnabled(binder.isValid()));
         btnAddCategory.addClickShortcut(Key.ENTER);
         btnAddCategory.addClickListener(buttonClickEvent -> {
             try {
@@ -155,12 +170,17 @@ public class categoryInfo extends VerticalLayout implements BeforeEnterObserver 
         });
         init();
         grid.setItems(repository.findAll());
-        //grid.setDataProvider(dataProvider);
         layout.add(grid);
         add(layout);
 
     }
-
+    /**
+     * Метод, вызываемый перед открытием страницы. Проверяет аутентификацию пользователя
+     * и перенаправляет на страницу с сообщением об ошибке, если пользователь не является
+     * сотрудником товароведения.
+     *
+     * @param beforeEnterEvent событие перед входом, содержащее информацию о переходе на другую страницу
+     */
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
